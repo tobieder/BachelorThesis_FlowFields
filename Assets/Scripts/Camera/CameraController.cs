@@ -65,28 +65,28 @@ public class CameraController : MonoBehaviour
 
         if(Input.GetMouseButtonDown(0))
         {
-            Plane plane = new Plane(Vector3.up, Vector3.zero);
+            Plane _plane = new Plane(Vector3.up, Vector3.zero);
 
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            float entry;
+            float _entry;
 
-            if(plane.Raycast(ray, out entry))
+            if(_plane.Raycast(_ray, out _entry))
             {
-                dragStartPosition = ray.GetPoint(entry);
+                dragStartPosition = _ray.GetPoint(_entry);
             }
         }
         if (Input.GetMouseButton(0))
         {
-            Plane plane = new Plane(Vector3.up, Vector3.zero);
+            Plane _plane = new Plane(Vector3.up, Vector3.zero);
 
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            float entry;
+            float _entry;
 
-            if (plane.Raycast(ray, out entry))
+            if (_plane.Raycast(_ray, out _entry))
             {
-                dragCurrentPosition = ray.GetPoint(entry);
+                dragCurrentPosition = _ray.GetPoint(_entry);
 
                 newPosition = transform.position + dragStartPosition - dragCurrentPosition;
             }
@@ -100,11 +100,11 @@ public class CameraController : MonoBehaviour
         {
             rotateCurrentPosition = Input.mousePosition;
 
-            Vector3 difference = rotateStartPosition - rotateCurrentPosition;
+            Vector3 _difference = rotateStartPosition - rotateCurrentPosition;
 
             rotateStartPosition = rotateCurrentPosition;
 
-            newRotation *= Quaternion.Euler(Vector3.up * (-difference.x / 5f));
+            newRotation *= Quaternion.Euler(Vector3.up * (-_difference.x / 5f));
         }
     }
 
