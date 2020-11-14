@@ -2,24 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestingScript : MonoBehaviour
+public class WorldText
 {
-    public int width = 5;
-    public int height = 5;
-    public float cellSize = 10.0f;
-
-    Grid grid;
-
-    private void Start()
-    {
-        grid = new Grid(width, height, cellSize);
-    }
-
-    private void Update()
-    {
-        grid.Update();
-    }
-
     // Debug text
     public static TextMesh CreateWorldText(string text, Transform parent = null, Vector3 localPosition = default(Vector3), int fontSize = 40, Color? color = null, TextAnchor textAnchor = TextAnchor.UpperLeft, TextAlignment textAlignment = TextAlignment.Left, int sortingOrder = 5000)
     {

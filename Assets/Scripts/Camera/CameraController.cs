@@ -18,14 +18,17 @@ public class CameraController : MonoBehaviour
     public float rotationAmount;
     public Vector3 zoomAmount;
 
-    public Vector3 newPosition;
-    public Quaternion newRotation;
-    public Vector3 newZoom;
+    public float minZoom;
+    public float maxZoom;
 
-    public Vector3 dragStartPosition;
-    public Vector3 dragCurrentPosition;
-    public Vector3 rotateStartPosition;
-    public Vector3 rotateCurrentPosition;
+    private Vector3 newPosition;
+    private Quaternion newRotation;
+    private Vector3 newZoom;
+
+    private Vector3 dragStartPosition;
+    private Vector3 dragCurrentPosition;
+    private Vector3 rotateStartPosition;
+    private Vector3 rotateCurrentPosition;
 
     // Start is called before the first frame update
     void Start()
@@ -48,12 +51,27 @@ public class CameraController : MonoBehaviour
         {
             HandleMouseInput();
             HandleMovementInput();
+            HandleInput();
         }
 
         if(Input.GetKeyDown(KeyCode.Escape))
         {
             followTransform = null;
         }
+    }
+
+    void HandleInput()
+    {
+        newPosition.x = Mathf.Clamp(newPosition.x, 0.0f, 400.0f);
+        newPosition.z = Mathf.Clamp(newPosition.z, 0.0f, 400.0f);
+
+        transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * movementTime);
+        transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, Time.deltaTime * movementTime);
+
+        newZoom.y = Mathf.Clamp(newZoom.y, minZoom, maxZoom);
+        newZoom.z = Mathf.Clamp(newZoom.z, -maxZoom, -minZoom);
+
+        cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, newZoom, Time.deltaTime * movementTime);
     }
 
     void HandleMouseInput()
@@ -153,9 +171,5 @@ public class CameraController : MonoBehaviour
         {
             newZoom -= zoomAmount;
         }
-
-        transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * movementTime);
-        transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, Time.deltaTime * movementTime);
-        cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, newZoom, Time.deltaTime * movementTime);
     }
 }

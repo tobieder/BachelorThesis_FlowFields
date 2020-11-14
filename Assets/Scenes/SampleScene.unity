@@ -514,8 +514,9 @@ GameObject:
   m_Component:
   - component: {fileID: 535264246}
   - component: {fileID: 535264245}
+  - component: {fileID: 535264247}
   m_Layer: 0
-  m_Name: Test
+  m_Name: GridCreator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -533,9 +534,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b39c003f6639e3468303d2c8d37557c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 10
-  height: 10
-  cellSize: 10
+  width: 100
+  height: 100
+  cellSize: 1
 --- !u!4 &535264246
 Transform:
   m_ObjectHideFlags: 0
@@ -544,12 +545,27 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 535264244}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -104.21387, y: 145.40755, z: -79.27356}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &535264247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 535264244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c07689a259b3624db897a538c415767, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gridPercentage: 0.95
+  gridMeshMaterial: {fileID: 2100000, guid: 28583afd0712d4b4b9c27226b417afb6, type: 2}
+  showVertexIndices: 0
 --- !u!1 &538337107
 GameObject:
   m_ObjectHideFlags: 0
@@ -1578,7 +1594,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 4
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -2393,13 +2409,8 @@ MonoBehaviour:
   movementTime: 5
   rotationAmount: 1
   zoomAmount: {x: 0, y: -10, z: 10}
-  newPosition: {x: 0, y: 0, z: 0}
-  newRotation: {x: 0, y: 0, z: 0, w: 0}
-  newZoom: {x: 0, y: 0, z: 0}
-  dragStartPosition: {x: 0, y: 0, z: 0}
-  dragCurrentPosition: {x: 0, y: 0, z: 0}
-  rotateStartPosition: {x: 0, y: 0, z: 0}
-  rotateCurrentPosition: {x: 0, y: 0, z: 0}
+  minZoom: 10
+  maxZoom: 200
 --- !u!4 &2007873954
 Transform:
   m_ObjectHideFlags: 0
