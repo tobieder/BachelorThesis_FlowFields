@@ -10,7 +10,7 @@ public class Grid
     private float cellSize;
 
     private Cell[,] gridArray;
-    private TextMesh[,] debugTextArray;
+    //private TextMesh[,] debugTextArray;
 
     public struct Cell
     {
@@ -40,14 +40,14 @@ public class Grid
                 gridArray[x, z].xPos = x;
                 gridArray[x, z].zPos = z;
                 gridArray[x, z].walkable = true;
-                gridArray[x, z].flowFieldDirection = new Vector3(Random.Range(-1.0f, 1.0f), 0.0f, Random.Range(-1.0f, 1.0f)).normalized * 0.5f;
+
+                gridArray[x, z].flowFieldDirection = new Vector3(0.0f, 0.0f, 0.0f);
             }
         }
     }
 
     public void Update()
     {
-        /*
         for (int x = 0; x < gridArray.GetLength(0); x++)
         {
             for (int z = 0; z < gridArray.GetLength(1); z++)
@@ -55,12 +55,58 @@ public class Grid
                 DrawArrow.ForDebug(GetWorldPositon(x, z), gridArray[x, z].flowFieldDirection, Color.red);
             }
         }
-        */
     }
 
-    public Cell[,] GetCellArray()
+    public void InitializeFFVectorsRandom()
     {
-        return gridArray;
+        for (int x = 0; x < gridArray.GetLength(0); x++)
+        {
+            for (int z = 0; z < gridArray.GetLength(1); z++)
+            {
+                gridArray[x, z].flowFieldDirection = new Vector3(Random.Range(-1.0f, 1.0f), 0.0f, Random.Range(-1.0f, 1.0f)).normalized * 0.5f;
+            }
+        }
+    }
+
+    public void InitializeFFVectors(Vector3 direction)
+    {
+        for (int x = 0; x < gridArray.GetLength(0); x++)
+        {
+            for (int z = 0; z < gridArray.GetLength(1); z++)
+            {
+                gridArray[x, z].flowFieldDirection = direction;
+            }
+        }
+    }
+
+    public void InitializeFFVectors(Vector3[,] directions)
+    {
+        for (int x = 0; x < gridArray.GetLength(0); x++)
+        {
+            for (int z = 0; z < gridArray.GetLength(1); z++)
+            {
+                gridArray[x, z].flowFieldDirection = directions[x, z];
+            }
+        }
+    }
+
+    public Cell getCell(int x, int z)
+    {
+        if(x >= 0 && x < width && z >= 0 && z < height)
+        {
+            return gridArray[x, z];
+        }
+
+        Debug.LogError("Grid.GetCell(x, z): x or z value out of Range.");
+        return new Cell();
+    }
+
+    public Cell getCellFromPosition(float x, float z)
+    {
+        int _x = Mathf.RoundToInt(x / cellSize);
+        int _z = Mathf.RoundToInt(z / cellSize);
+
+        return getCell(_x, _z);
     }
 
     public void SetValue(int _x, int _z, Vector3 value)
@@ -75,5 +121,20 @@ public class Grid
     public Vector3 GetWorldPositon(int x, int z)
     {
         return new Vector3(x, 0.0f, z) * cellSize;
+    }
+
+    public float GetWidth()
+    {
+        return width;
+    }
+
+    public float GetHeight()
+    {
+        return height;
+    }
+
+    public float GetCellSize()
+    {
+        return cellSize;
     }
 }

@@ -8,11 +8,11 @@ public class GridCreator : MonoBehaviour
     public int height = 400;
     public float cellSize = 1.0f;
 
-    Grid grid;
+    public static Grid grid;
 
     private void Start()
     {
-        grid = new Grid(width, height, cellSize);
+        InitialzeGrid();
     }
 
     private void Update()
@@ -20,8 +20,19 @@ public class GridCreator : MonoBehaviour
         grid.Update();
     }
 
-    public Grid GetGrid()
+    public void InitialzeGrid()
     {
-        return grid;
+
+        HandlePreCalculatedFlowFieldFile directions = GetComponent<HandlePreCalculatedFlowFieldFile>();
+        if(directions.input != null)
+        {
+            grid = new Grid(directions.GetWidth(), directions.GetHeight(), cellSize);
+            grid.InitializeFFVectors(directions.GetFlowFieldVectors());
+        }
+        else
+        { 
+            grid = new Grid(width, height, cellSize);
+            grid.InitializeFFVectorsRandom();
+        }
     }
 }

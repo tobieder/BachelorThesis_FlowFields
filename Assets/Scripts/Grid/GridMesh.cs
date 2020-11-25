@@ -8,13 +8,58 @@ public class GridMesh : MonoBehaviour
     public float gridPercentage = 0.1f;
     public Material gridMeshMaterial;
 
-    public bool showVertexIndices;
+    //public bool showVertexIndices;
+
+    private GameObject gridMesh;
+    private MeshFilter meshFilter;
+    private MeshRenderer meshRenderer;
 
     void Start()
     {
         GridCreator gridCreator = GetComponent<GridCreator>();
-        Grid grid = gridCreator.GetGrid();
 
+        MeshUpdateEditor();
+    }
+
+    public void MeshUpdateEditor()
+    {
+        GridCreator gridCreator = GetComponent<GridCreator>();
+        if (GridCreator.grid == null)
+        {
+            gridCreator.InitialzeGrid();
+        }
+
+        Debug.Log(GridCreator.grid.getCell(0, 0).flowFieldDirection);
+
+        if (!gridMesh)
+        {
+            gridMesh = new GameObject("GridMesh");
+            gridMesh.transform.parent = this.transform;
+
+            meshRenderer = gridMesh.AddComponent<MeshRenderer>();
+        }
+        if(!meshFilter)
+        {
+            meshFilter = gridMesh.GetComponent<MeshFilter>();
+            if (!meshFilter)
+            {
+                meshFilter = gridMesh.AddComponent<MeshFilter>();
+            }
+        }
+        if (!meshRenderer)
+        {
+            meshRenderer = gridMesh.GetComponent<MeshRenderer>();
+            if (!meshRenderer)
+            {
+                meshRenderer = gridMesh.AddComponent<MeshRenderer>();
+            }
+        }
+
+        CreateMesh(GridCreator.grid, gridCreator);
+    }
+
+    void CreateMesh(Grid grid, GridCreator gridCreator)
+    {
         Vector3[] vertices = new Vector3[(gridCreator.width * gridCreator.height * 4) + 4];
         Vector2[] uvs = new Vector2[(gridCreator.width * gridCreator.height * 4) + 4];
         int[] triangles = new int[gridCreator.width * gridCreator.height * 6 * 3 + (8 * 3)];
@@ -23,7 +68,7 @@ public class GridMesh : MonoBehaviour
 
         // ----- Set Vertices -----
         int vertexCount = 0;
-        for(int z = 0; z < gridCreator.height; z++)
+        for (int z = 0; z < gridCreator.height; z++)
         {
             for (int x = 0; x < gridCreator.width; x++)
             {
@@ -32,6 +77,7 @@ public class GridMesh : MonoBehaviour
                 vertices[vertexCount + 2] = grid.GetWorldPositon(x, z) + (new Vector3(halfCellsize, 0.0f, halfCellsize) * gridPercentage);
                 vertices[vertexCount + 3] = grid.GetWorldPositon(x, z) + (new Vector3(halfCellsize, 0.0f, -halfCellsize) * gridPercentage);
 
+                /*
                 if (showVertexIndices)
                 {
                     WorldText.CreateWorldText(this.transform, (vertexCount + 0).ToString(), vertices[vertexCount + 0], 10, Color.red, TextAnchor.MiddleCenter, TextAlignment.Center, 5000);
@@ -39,6 +85,7 @@ public class GridMesh : MonoBehaviour
                     WorldText.CreateWorldText(this.transform, (vertexCount + 2).ToString(), vertices[vertexCount + 2], 10, Color.red, TextAnchor.MiddleCenter, TextAlignment.Center, 5000);
                     WorldText.CreateWorldText(this.transform, (vertexCount + 3).ToString(), vertices[vertexCount + 3], 10, Color.red, TextAnchor.MiddleCenter, TextAlignment.Center, 5000);
                 }
+                */
                 vertexCount += 4;
             }
         }
@@ -46,7 +93,7 @@ public class GridMesh : MonoBehaviour
         // ----- Set Triangles -----
         int triangleCount = 0;
 
-        for(int z = 1; z < gridCreator.height; z++)
+        for (int z = 1; z < gridCreator.height; z++)
         {
             triangles[triangleCount + 0] = (z * gridCreator.width) * 4;
             triangles[triangleCount + 1] = ((z * gridCreator.width) - gridCreator.width) * 4 + 2;
@@ -118,18 +165,20 @@ public class GridMesh : MonoBehaviour
         }
 
         // ----- Borders -----
-        vertices[vertexCount + 0] = grid.GetWorldPositon(0, 0) + (new Vector3(-halfCellsize, 0.0f, -halfCellsize) * (1.0f + (1.0f - gridPercentage))); 
+        vertices[vertexCount + 0] = grid.GetWorldPositon(0, 0) + (new Vector3(-halfCellsize, 0.0f, -halfCellsize) * (1.0f + (1.0f - gridPercentage)));
         vertices[vertexCount + 1] = grid.GetWorldPositon(gridCreator.width - 1, 0) + (new Vector3(halfCellsize, 0.0f, -halfCellsize) * (1.0f + (1.0f - gridPercentage)));
         vertices[vertexCount + 2] = grid.GetWorldPositon(gridCreator.width - 1, gridCreator.height - 1) + (new Vector3(halfCellsize, 0.0f, halfCellsize) * (1.0f + (1.0f - gridPercentage)));
         vertices[vertexCount + 3] = grid.GetWorldPositon(0, gridCreator.height - 1) + (new Vector3(-halfCellsize, 0.0f, halfCellsize) * (1.0f + (1.0f - gridPercentage)));
 
-        if(showVertexIndices)
+        /*
+        if (showVertexIndices)
         {
             WorldText.CreateWorldText(this.transform, (vertexCount + 0).ToString(), vertices[vertexCount + 0], 10, Color.red, TextAnchor.MiddleCenter, TextAlignment.Center, 5000);
             WorldText.CreateWorldText(this.transform, (vertexCount + 1).ToString(), vertices[vertexCount + 1], 10, Color.red, TextAnchor.MiddleCenter, TextAlignment.Center, 5000);
             WorldText.CreateWorldText(this.transform, (vertexCount + 2).ToString(), vertices[vertexCount + 2], 10, Color.red, TextAnchor.MiddleCenter, TextAlignment.Center, 5000);
             WorldText.CreateWorldText(this.transform, (vertexCount + 3).ToString(), vertices[vertexCount + 3], 10, Color.red, TextAnchor.MiddleCenter, TextAlignment.Center, 5000);
         }
+        */
 
         triangles[triangleCount + 0] = 0;
         triangles[triangleCount + 1] = vertexCount + 1;
@@ -175,15 +224,9 @@ public class GridMesh : MonoBehaviour
         mesh.uv = uvs;
         mesh.triangles = triangles;
 
-        GameObject go = new GameObject("GridMesh");
-        go.transform.parent = this.transform;
+        meshFilter.mesh = mesh;
 
-        MeshFilter filter = go.AddComponent<MeshFilter>();
-        MeshRenderer renderer = go.AddComponent<MeshRenderer>();
-
-        filter.mesh = mesh;
-
-        renderer.sharedMaterial = gridMeshMaterial;
-        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        meshRenderer.sharedMaterial = gridMeshMaterial;
+        meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
     }
 }
