@@ -13,6 +13,7 @@ public class NPC : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        this.transform.rotation = Quaternion.Euler(0.0f, 1.0f, 0.0f);
     }
 
     private void FixedUpdate()
@@ -20,7 +21,10 @@ public class NPC : MonoBehaviour
         velocity = GridCreator.grid.getCellFromPosition(transform.position.x, transform.position.z).flowFieldDirection;
 
         rb.AddForce(velocity);
-        this.transform.rotation = Quaternion.LookRotation(rb.velocity, Vector3.up);
+        if (rb.velocity != Vector3.zero)
+        {
+            this.transform.rotation = Quaternion.LookRotation(rb.velocity, Vector3.up);
+        }
 
         if(rb.velocity.magnitude > maxSpeed)
         {

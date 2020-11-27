@@ -29,8 +29,6 @@ public class GridMesh : MonoBehaviour
             gridCreator.InitialzeGrid();
         }
 
-        Debug.Log(GridCreator.grid.getCell(0, 0).flowFieldDirection);
-
         if (!gridMesh)
         {
             gridMesh = new GameObject("GridMesh");
