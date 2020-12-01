@@ -18,7 +18,7 @@ public class NPC : MonoBehaviour
 
     private void FixedUpdate()
     {
-        velocity = GridCreator.grid.getCellFromPosition(transform.position.x, transform.position.z).flowFieldDirection;
+        velocity = GridCreator.grid.getCellFromPosition(transform.position.x, transform.position.z).GetFlowFieldDirection();
 
         rb.AddForce(velocity);
         if (rb.velocity != Vector3.zero)
