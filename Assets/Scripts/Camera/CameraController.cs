@@ -6,7 +6,8 @@ using UnityEngine.EventSystems;
 
 public class CameraController : MonoBehaviour
 {
-    public static CameraController instance;
+    private static CameraController _instance;
+    public static CameraController Instance { get { return _instance; } }
 
     public Transform followTransform;
     public Transform cameraTransform;
@@ -31,14 +32,32 @@ public class CameraController : MonoBehaviour
     private Vector3 rotateStartPosition;
     private Vector3 rotateCurrentPosition;
 
+    private Grid grid;
+    private float maxWidth;
+    private float maxHeight;
+
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        instance = this;
-
         newPosition = transform.position;
         newRotation = transform.rotation;
         newZoom = cameraTransform.localPosition;
+
+        grid = GridCreator.grid;
+        maxWidth = grid.GetWidth() * grid.GetCellSize();
+        maxHeight = grid.GetHeight() * grid.GetCellSize();
     }
 
     // Update is called once per frame
@@ -69,6 +88,23 @@ public class CameraController : MonoBehaviour
         transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * movementTime);
         transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, Time.deltaTime * movementTime);
 
+        if(transform.position.x < 0)
+        {
+            transform.position = new Vector3(0.0f, 0.0f, transform.position.z);
+        }
+        else if(transform.position.x >= maxWidth)
+        {
+            transform.position = new Vector3(maxWidth, 0.0f, transform.position.z);
+        }
+        if (transform.position.z < 0)
+        {
+            transform.position = new Vector3(transform.position.x, 0.0f, 0.0f);
+        }
+        else if (transform.position.z >= maxHeight)
+        {
+            transform.position = new Vector3(transform.position.x, 0.0f, maxHeight);
+        }
+
         newZoom.y = Mathf.Clamp(newZoom.y, minZoom, maxZoom);
         newZoom.z = Mathf.Clamp(newZoom.z, -maxZoom, -minZoom);
 
@@ -84,6 +120,7 @@ public class CameraController : MonoBehaviour
 
         if (!EventSystem.current.IsPointerOverGameObject())
         {
+            /*
             if (Input.GetMouseButtonDown(0))
             {
                 Plane _plane = new Plane(Vector3.up, Vector3.zero);
@@ -112,7 +149,7 @@ public class CameraController : MonoBehaviour
                     newPosition = transform.position + dragStartPosition - dragCurrentPosition;
                 }
             }
-
+            */
             if (Input.GetMouseButtonDown(2))
             {
                 rotateStartPosition = Input.mousePosition;

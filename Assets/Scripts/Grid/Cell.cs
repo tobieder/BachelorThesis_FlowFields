@@ -5,8 +5,9 @@ using UnityEngine;
 public enum GroundType
 {
     Grass,
-    Rocky,
-    Sand
+    DarkGrass,
+    Sand,
+    Rocky
 }
 
 public class Cell
@@ -24,9 +25,10 @@ public class Cell
 
     // Flow Field
     private byte cost; // 1 - 254 (255 == wall/unwakable) (0 == goal)++
+    private byte originalCost;
     private ushort bestCost;
     private short integration;
-    private Vector3 flowFieldDirection;
+    private Vector3[] flowFieldDirections;
 
     public Cell(float _xPos, float _zPos, int _xIndex, int _zIndex, byte _cost)
     {
@@ -35,10 +37,13 @@ public class Cell
         xIndex = _xIndex;
         zIndex = _zIndex;
         cost = _cost;
+        originalCost = cost;
 
         bestCost = ushort.MaxValue;
 
         uvs = new int[4];
+
+        flowFieldDirections = new Vector3[byte.MaxValue + 1];
     }
 
     public void SetCost(byte _newCost)
@@ -51,6 +56,16 @@ public class Cell
         return cost;
     }
 
+    public void SetOriginalCost(byte _newOriginalCost)
+    {
+        originalCost = _newOriginalCost;
+    }
+
+    public byte GetOriginalCost()
+    {
+        return originalCost;
+    }
+
     public void SetIntegration(short _newIntegration)
     {
         integration = _newIntegration;
@@ -61,14 +76,14 @@ public class Cell
         return integration;
     }
 
-    public void SetFlowFieldDirection(Vector3 _newFlowFieldDirection)
+    public void SetFlowFieldDirection(byte _index, Vector3 _newFlowFieldDirection)
     {
-        flowFieldDirection = _newFlowFieldDirection;
+        flowFieldDirections[_index] = _newFlowFieldDirection;
     }
 
-    public Vector3 GetFlowFieldDirection()
+    public Vector3 GetFlowFieldDirection(byte _index)
     {
-        return flowFieldDirection;
+        return flowFieldDirections[_index];
     }
 
     public void SetBestCost(ushort _bestCost)

@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 2464243254312495573}
   - component: {fileID: 2464243254312495594}
   - component: {fileID: 2464243254312495595}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: NPC
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -45,7 +45,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65e82b53d7a66794bac22008c86d1d01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 1
+  maxSpeed: 3
+  targetRadius: 1
+  slowRadius: 5
 --- !u!54 &2464243254312495595
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -74,7 +76,7 @@ GameObject:
   - component: {fileID: 2464243255140645195}
   - component: {fileID: 2464243255140645194}
   - component: {fileID: 2464243255140645301}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Geometry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -171,7 +173,7 @@ GameObject:
   - component: {fileID: 2464243255487359246}
   - component: {fileID: 2464243255487359241}
   - component: {fileID: 2464243255487359240}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Direction
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -250,7 +252,7 @@ SphereCollider:
   m_GameObject: {fileID: 2464243255487359242}
   m_Material: {fileID: 13400000, guid: 4893a4396ac16914790e796207a68ae7, type: 2}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}

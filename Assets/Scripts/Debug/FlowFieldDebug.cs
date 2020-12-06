@@ -1,7 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UnityEngine;
+
+#if UNITY_EDITOR
 using UnityEditor;
-using UnityEngine;
+#endif
+
 
 public class FlowFieldDebug : MonoBehaviour
 {
@@ -17,6 +19,7 @@ public class FlowFieldDebug : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+#if UNITY_EDITOR
         if(GridCreator.grid == null)
         {
             return;
@@ -41,8 +44,15 @@ public class FlowFieldDebug : MonoBehaviour
                     Handles.Label(new Vector3(cell.xPos, 0.0f, cell.zPos), cell.GetBestCost().ToString(), style);
                 };
                 break;
+            case DisplayInfo.FlowFieldDirection:
+                foreach (Cell cell in GridCreator.grid.GetGridArray())
+                {
+                    DrawArrow.ForDebug(new Vector3(cell.xPos, 0.0f, cell.zPos), cell.GetFlowFieldDirection(byte.MaxValue), Color.red);
+                };
+                break;
             default:
                 break;
         };
+#endif
     }
 }

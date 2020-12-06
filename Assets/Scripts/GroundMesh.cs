@@ -23,7 +23,7 @@ public class GroundMesh : MonoBehaviour
     {
         if (!groundMesh)
         {
-            groundMesh = new GameObject("GridMesh");
+            groundMesh = new GameObject("GroundMesh");
             groundMesh.transform.parent = this.transform;
 
             meshRenderer = groundMesh.AddComponent<MeshRenderer>();
@@ -85,13 +85,25 @@ public class GroundMesh : MonoBehaviour
         {
             for (int z = 0; z < grid.GetHeight(); z++)
             {
-                if(Mathf.PerlinNoise((float)x / (float)GridCreator.grid.GetWidth() * scale, (float)z / (float)GridCreator.grid.GetHeight() * scale) >= 0.5f)
+                Cell currCell = GridCreator.grid.getCell(z, x);
+                float perlin = Mathf.PerlinNoise((float)x / (float)GridCreator.grid.GetWidth() * scale, (float)z / (float)GridCreator.grid.GetHeight() * scale);
+                if (perlin < 0.4f)
                 {
-                    curruvs = GetUVs(GroundType.Sand);
+                    curruvs = GetUVs(GroundType.Grass);
+                    currCell.SetCost(1);
+                    currCell.SetOriginalCost(1);
+                }
+                else if(perlin < 0.6f)
+                {
+                    curruvs = GetUVs(GroundType.DarkGrass);
+                    currCell.SetCost(2);
+                    currCell.SetOriginalCost(2);
                 }
                 else
                 {
-                    curruvs = GetUVs(GroundType.Grass);
+                    curruvs = GetUVs(GroundType.Sand);
+                    currCell.SetCost(4);
+                    currCell.SetOriginalCost(4);
                 }
 
                 uvs[uvIterator + 0] = curruvs[0];
@@ -156,6 +168,12 @@ public class GroundMesh : MonoBehaviour
                 ret[1] = new Vector2(4.0f / imgPerSite, 1.0f / imgPerSite);
                 ret[2] = new Vector2(4.0f / imgPerSite, 2.0f / imgPerSite);
                 ret[3] = new Vector2(3.0f / imgPerSite, 2.0f / imgPerSite);
+                break;
+            case GroundType.DarkGrass:
+                ret[0] = new Vector2(3.0f / imgPerSite, 3.0f / imgPerSite);
+                ret[1] = new Vector2(4.0f / imgPerSite, 3.0f / imgPerSite);
+                ret[2] = new Vector2(4.0f / imgPerSite, 4.0f / imgPerSite);
+                ret[3] = new Vector2(3.0f / imgPerSite, 4.0f / imgPerSite);
                 break;
             default:
                 Debug.LogError("Ground Type not available.");
