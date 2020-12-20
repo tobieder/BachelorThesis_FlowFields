@@ -16,12 +16,15 @@ public class SpawnBuilding : MonoBehaviour
 
     private GameObject preview;
 
-    private bool unbuildable = false;
     private bool even;
     private Vector3 offset;
 
+    private int layerMask;
+
     private void Start()
     {
+        layerMask = SetLayerMask("Ground");
+
         even = false;
         if(size.x % 2 == 0)
         {
@@ -63,7 +66,7 @@ public class SpawnBuilding : MonoBehaviour
 
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit, 50000.0f, layerMask))
             {
                 Vector3 currPos;
                 if(even)
@@ -76,9 +79,7 @@ public class SpawnBuilding : MonoBehaviour
                 }
                 preview.transform.position = currPos;
 
-                CheckUnbuildable(currPos);
-
-                if(!unbuildable)
+                if(!CheckUnbuildable(currPos))
                 {
                     foreach (var renderer in preview.GetComponentsInChildren<Renderer>(true))
                     {
@@ -123,7 +124,7 @@ public class SpawnBuilding : MonoBehaviour
         }
     }
 
-    private void CheckUnbuildable(Vector3 _position)
+    private bool CheckUnbuildable(Vector3 _position)
     {
         if (even)
         {
@@ -136,32 +137,45 @@ public class SpawnBuilding : MonoBehaviour
                     Cell currCell = GridCreator.grid.getCellFromPosition(currPos.x, currPos.z);
                     if (currCell == null)
                     {
-                        unbuildable = true;
-                        return;
+                        return true;
                     }
                     if (currCell.GetCost() == byte.MaxValue)
                     {
-                        unbuildable = true;
-                        return;
+                        return true;
                     }
                 }
             }
-            unbuildable = false;
+            return false;
         }
         else
         {
             Cell currCell = GridCreator.grid.getCellFromPosition(_position.x, _position.z);
             if(currCell == null)
             {
-                unbuildable = true;
-                return;
+                return true;
             }
             if(currCell.GetCost() == byte.MaxValue)
             {
-                unbuildable = true;
-                return;
+                return true;
             }
-            unbuildable = false;
+            return false;
         }
+    }
+
+    public int SetLayerMask(params string[] layerNames)
+    {
+        int num = 0;
+        
+        for(int i = 0; i < layerNames.Length; i++)
+        {
+            string layerName = layerNames[i];
+            int num2 = LayerMask.NameToLayer(layerName);
+            if(num2 != -1)
+            {
+                num |= 1 << num2;
+            }
+        }
+
+        return num;
     }
 }

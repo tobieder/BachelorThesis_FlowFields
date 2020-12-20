@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// TEMP
-using UnityEditor;
-
 public class Selection : MonoBehaviour
 {
     public LayerMask selectableLayer;
@@ -36,29 +33,34 @@ public class Selection : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetMouseButtonDown(0))
+        Select();
+    }
+
+    private void Select()
+    {
+        if (Input.GetMouseButtonDown(0))
         {
             dragStartPosition = Input.mousePosition;
         }
 
-        if(Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0))
         {
-            if((dragStartPosition - Input.mousePosition).magnitude > 40.0f)
+            if ((dragStartPosition - Input.mousePosition).magnitude > 40.0f)
             {
                 dragSelect = true;
             }
         }
 
 
-        if(Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0))
         {
             if (!dragSelect)
             {
                 Ray ray = Camera.main.ScreenPointToRay(dragStartPosition);
-                
-                if(Physics.Raycast(ray, out hit, 50000.0f, selectableLayer))
+
+                if (Physics.Raycast(ray, out hit, 50000.0f, selectableLayer))
                 {
-                    if(Input.GetKey(KeyCode.LeftShift))
+                    if (Input.GetKey(KeyCode.LeftShift))
                     {
                         selectedDictionary.AddSelected(hit.transform.gameObject);
                     }
@@ -70,7 +72,7 @@ public class Selection : MonoBehaviour
                 }
                 else
                 {
-                    if(!Input.GetKey(KeyCode.LeftShift))
+                    if (!Input.GetKey(KeyCode.LeftShift))
                     {
                         selectedDictionary.DeselectAll();
                     }

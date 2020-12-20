@@ -4,18 +4,20 @@
 using UnityEditor;
 #endif
 
+public enum DisplayInfo
+{
+    None,
+    Cost,
+    Integration,
+    FlowFieldDirection
+};
 
 public class FlowFieldDebug : MonoBehaviour
 {
-    public enum DisplayInfo
-    {
-        None,
-        Cost,
-        Integration,
-        FlowFieldDirection
-    };
 
     public DisplayInfo displayInfo;
+
+    public byte flowFieldLayer = 0;
 
     private void OnDrawGizmos()
     {
@@ -47,7 +49,7 @@ public class FlowFieldDebug : MonoBehaviour
             case DisplayInfo.FlowFieldDirection:
                 foreach (Cell cell in GridCreator.grid.GetGridArray())
                 {
-                    DrawArrow.ForDebug(new Vector3(cell.xPos, 0.0f, cell.zPos), cell.GetFlowFieldDirection(byte.MaxValue), Color.red);
+                    DrawArrow.ForDebug(new Vector3(cell.xPos, 0.0f, cell.zPos), cell.GetFlowFieldDirection(flowFieldLayer), Color.red);
                 };
                 break;
             default:
