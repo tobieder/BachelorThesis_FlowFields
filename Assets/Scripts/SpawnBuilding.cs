@@ -36,6 +36,8 @@ public class SpawnBuilding : MonoBehaviour
             even = true;
             offset.z = 0.5f;
         }
+
+        Debug.Log(building.name + ": " + even);
     }
 
     public void OnSelected()
@@ -105,7 +107,7 @@ public class SpawnBuilding : MonoBehaviour
     private void CreateBuilding(Vector3 _position)
     {
         GameObject instance = Instantiate(building, _position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), parent.transform);
-        instance.GetComponent<MeshCollider>().enabled = true;
+        instance.GetComponent<Collider>().enabled = true;
         if (even)
         {
             // Set Cost Field
@@ -121,6 +123,14 @@ public class SpawnBuilding : MonoBehaviour
         else
         {
             GridCreator.grid.getCellFromPosition(_position.x, _position.z).SetCost(byte.MaxValue);
+            for (int x = Mathf.CeilToInt(-size.x / 2f); x < Mathf.CeilToInt(size.x / 2f); x++)
+            {
+                for (int z = Mathf.CeilToInt(-size.y / 2f); z < Mathf.CeilToInt(size.y / 2f); z++)
+                {
+                    Vector3 currPos = new Vector3(_position.x + x + offset.x, 0.0f, _position.z + z + offset.z);
+                    GridCreator.grid.getCellFromPosition(currPos.x, currPos.z).SetCost(byte.MaxValue);
+                }
+            }
         }
     }
 

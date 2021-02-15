@@ -8,6 +8,7 @@ using UnityEditor;
 #endif
 
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Animator))]
 public class NPC : MonoBehaviour
 {
     public float maxSpeed;
@@ -18,9 +19,11 @@ public class NPC : MonoBehaviour
 
     private byte flowmapIndex;
 
+    // ANIMATOR
+    private Animator animator;
+
     // TEMP
     public float targetRadius;
-    public float slowRadius;
 
     private void Start()
     {
@@ -32,11 +35,15 @@ public class NPC : MonoBehaviour
 
         rb = GetComponent<Rigidbody>();
         this.transform.rotation = Quaternion.Euler(0.0f, 1.0f, 0.0f);
+
+        animator = GetComponent<Animator>(); 
+        
+        this.transform.rotation = Quaternion.LookRotation(new Vector3(Random.Range(-1, 1), 0.0f, Random.Range(-1, 1)), Vector3.up);
     }
 
     private void OnDestroy()
     {
-        NPCManager.Instance.npcs.Remove(this);
+        _ = NPCManager.Instance.npcs.Remove(this);
     }
 
     private void FixedUpdate()
@@ -48,7 +55,7 @@ public class NPC : MonoBehaviour
         else
         {
             Cell currCell = GridCreator.grid.getCellFromPosition(transform.position.x, transform.position.z);
-            currMaxSpeed = maxSpeed / currCell.GetCost();
+            currMaxSpeed = maxSpeed * ((float)(byte.MaxValue - currCell.GetCost()) / (float)byte.MaxValue);
 
             if (FlowFieldManager.Instance.getDestinationCell() != null)
             {
@@ -58,7 +65,7 @@ public class NPC : MonoBehaviour
                 {
                     rb.velocity = Vector3.zero;
                 }
-                else if (dstToDestination > slowRadius)
+                else
                 {
                     velocity = currCell.GetFlowFieldDirection(flowmapIndex);
 
@@ -69,11 +76,6 @@ public class NPC : MonoBehaviour
                         rb.velocity = rb.velocity.normalized * currMaxSpeed;
                     }
                 }
-                else
-                {
-                    float targetSpeed = currMaxSpeed * dstToDestination / slowRadius;
-                    rb.velocity = currCell.GetFlowFieldDirection(flowmapIndex) * targetSpeed;
-                }
 
 
                 if (rb.velocity != Vector3.zero)
@@ -81,6 +83,15 @@ public class NPC : MonoBehaviour
                     this.transform.rotation = Quaternion.LookRotation(rb.velocity, Vector3.up);
                 }
             }
+        }
+
+        if (rb.velocity.magnitude > 0.2f && animator != null)
+        {
+            animator.SetBool("isWalking", true);
+        }
+        else
+        {
+            animator.SetBool("isWalking", false);
         }
     }
     

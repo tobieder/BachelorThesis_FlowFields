@@ -43,11 +43,13 @@ public class GridCreator : MonoBehaviour
         {
             grid = new Grid(directions.GetWidth(), directions.GetHeight(), cellSize);
             grid.InitializeFFVectors(byte.MaxValue, directions.GetFlowFieldVectors());
+            grid.InitializeNeighbors();
         }
         else
         { 
             grid = new Grid(width, height, cellSize);
             grid.InitializeFFVectors(byte.MaxValue, defaultFlowFieldDirection);
+            grid.InitializeNeighbors();
         }
     }
 }

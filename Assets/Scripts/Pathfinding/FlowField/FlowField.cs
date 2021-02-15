@@ -29,7 +29,10 @@ public class FlowField
         while (cellsToCheck.Count > 0)
         {
             Cell currCell = cellsToCheck.Dequeue();
-            List<Cell> neighbors = GetNeighbors(currCell.xIndex, currCell.zIndex, false);
+
+            //List<Cell> neighbors = GetNeighbors(currCell.xIndex, currCell.zIndex, false);
+            List<Cell> neighbors = currCell.GetNeighbors();
+
             foreach (Cell neighbor in neighbors)
             {
                 if (neighbor.GetCost() == byte.MaxValue)
@@ -55,7 +58,8 @@ public class FlowField
         {
             if (cell.GetCost() != byte.MaxValue)
             {
-                List<Cell> neighbors = GetNeighbors(cell.xIndex, cell.zIndex, true);
+                //List<Cell> neighbors = GetNeighbors(cell.xIndex, cell.zIndex, true);
+                List<Cell> neighbors = cell.GetNeighbors();
 
                 ushort bestCost = cell.GetBestCost();
 

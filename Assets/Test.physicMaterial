@@ -8,7 +8,7 @@ PhysicMaterial:
   m_PrefabAsset: {fileID: 0}
   m_Name: Test
   dynamicFriction: 0
-  staticFriction: 0.6
+  staticFriction: 0.2
   bounciness: 0
   frictionCombine: 0
   bounceCombine: 0

@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65e82b53d7a66794bac22008c86d1d01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 3
+  maxSpeed: 1
   targetRadius: 1
   slowRadius: 5
 --- !u!54 &2464243254312495595

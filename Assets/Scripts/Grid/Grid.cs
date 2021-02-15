@@ -34,6 +34,18 @@ public class Grid
         }
     }
 
+    public void InitializeNeighbors()
+    {
+        for (int x = 0; x < gridArray.GetLength(0); x++)
+        {
+            for (int z = 0; z < gridArray.GetLength(1); z++)
+            {
+                Debug.Log("Test");
+                gridArray[x, z].SetNeighbors();
+            }
+        }
+    }
+
     public void InitializeFFVectorsRandom(byte _index)
     {
         for (int x = 0; x < gridArray.GetLength(0); x++)
