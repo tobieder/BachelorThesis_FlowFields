@@ -11,7 +11,7 @@ public class FlowFieldManager : MonoBehaviour
 
     [SerializeField]
     private GameObject targetFlag;
-    private List<GameObject> placedFlags;
+    private Dictionary<byte, GameObject> placedFlags;
 
     private FlowField flowField;
     private Cell destinationCell;
@@ -36,7 +36,7 @@ public class FlowFieldManager : MonoBehaviour
 
         currentlyUsedFlowFields = new List<byte>();
 
-        placedFlags = new List<GameObject>();
+        placedFlags = new Dictionary<byte, GameObject>();
     }
 
     private void Update()
@@ -45,7 +45,8 @@ public class FlowFieldManager : MonoBehaviour
         {
             if (SelectedDictionary.selectedDictionary.Count == 0)
             {
-                Debug.Log("No units selected");
+                //Debug.Log("No units selected");
+                return;
             }
             else
             {
@@ -68,7 +69,7 @@ public class FlowFieldManager : MonoBehaviour
                     flowField.CreateIntegrationField(indexToUse, destinationCell);
                 }
 
-                placedFlags.Add(Instantiate<GameObject>(targetFlag, new Vector3(destinationCell.xPos, 0.0f, destinationCell.zPos), Quaternion.Euler(-90.0f, Random.Range(0.0f, 360.0f), 0.0f)));
+                placedFlags.Add(indexToUse, Instantiate<GameObject>(targetFlag, new Vector3(destinationCell.xPos, 0.0f, destinationCell.zPos), Quaternion.Euler(-90.0f, Random.Range(0.0f, 360.0f), 0.0f)));
 
                 CleanUpCurrentlyUsedFlowFields();
             }
@@ -93,7 +94,6 @@ public class FlowFieldManager : MonoBehaviour
             }
             else
             {
-                Debug.Log(hit.point.x + ", " + hit.point.z);
                 return GridCreator.grid.getCell(Mathf.RoundToInt(hit.point.x), Mathf.RoundToInt(hit.point.z));
             }
         }
@@ -117,11 +117,32 @@ public class FlowFieldManager : MonoBehaviour
             }
         }
 
+        List<byte> entriesToRemove = new List<byte>();
+        foreach (byte b in placedFlags.Keys)
+        {
+            if (!usedIndices.Contains(b))
+            {
+                GameObject temp = placedFlags[b];
+                entriesToRemove.Add(b);
+                Destroy(temp);
+            }
+        }
+
+        foreach(byte b in entriesToRemove)
+        {
+            placedFlags.Remove(b);
+        }
+
         currentlyUsedFlowFields = usedIndices;
     }
 
     public Cell getDestinationCell()
     {
         return destinationCell;
+    }
+
+    public List<byte> GetCurrentlyUsedFlowFields()
+    {
+        return currentlyUsedFlowFields;
     }
 }

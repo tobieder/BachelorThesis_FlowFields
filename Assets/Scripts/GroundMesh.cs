@@ -147,6 +147,15 @@ public class GroundMesh : MonoBehaviour
         meshRenderer.sharedMaterial = textureAtlas;
 
         meshCollider.sharedMesh = mesh;
+
+        Vector3[] normals = new Vector3[vertices.Length];
+        for(int i = 0; i < normals.Length; i++)
+        {
+            normals[i] = new Vector3(0.0f, 1.0f, 0.0f);
+        }
+        mesh.normals = normals;
+
+        mesh.RecalculateNormals();
     }
 
     public Vector2[] GetUVs(GroundType _groundType)

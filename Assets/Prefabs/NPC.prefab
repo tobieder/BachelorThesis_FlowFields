@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxSpeed: 1
   targetRadius: 1
-  slowRadius: 5
+  arriveRadius: 5
 --- !u!54 &2464243254312495595
 Rigidbody:
   m_ObjectHideFlags: 0

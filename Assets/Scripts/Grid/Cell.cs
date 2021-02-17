@@ -28,8 +28,7 @@ public class Cell
     // Flow Field
     private byte cost; // 1 - 254 (255 == wall/unwakable) (0 == goal)++
     private byte originalCost;
-    private ushort bestCost;
-    private short integration;
+    private ushort integration;
     private Vector3[] flowFieldDirections;
 
     // A*
@@ -53,7 +52,7 @@ public class Cell
         cost = _cost;
         originalCost = cost;
 
-        bestCost = ushort.MaxValue;
+        integration = ushort.MaxValue;
 
         flowFieldDirections = new Vector3[byte.MaxValue + 1];
 
@@ -161,12 +160,12 @@ public class Cell
         return originalCost;
     }
 
-    public void SetIntegration(short _newIntegration)
+    public void SetIntegration(ushort _newIntegration)
     {
         integration = _newIntegration;
     }
 
-    public short GetIntegration()
+    public ushort GetIntegration()
     {
         return integration;
     }
@@ -179,16 +178,6 @@ public class Cell
     public Vector3 GetFlowFieldDirection(byte _index)
     {
         return flowFieldDirections[_index];
-    }
-
-    public void SetBestCost(ushort _bestCost)
-    {
-        bestCost = _bestCost;
-    }
-
-    public ushort GetBestCost()
-    {
-        return bestCost;
     }
 
     #endregion

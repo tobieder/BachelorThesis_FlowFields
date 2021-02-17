@@ -36,8 +36,6 @@ public class SpawnBuilding : MonoBehaviour
             even = true;
             offset.z = 0.5f;
         }
-
-        Debug.Log(building.name + ": " + even);
     }
 
     public void OnSelected()

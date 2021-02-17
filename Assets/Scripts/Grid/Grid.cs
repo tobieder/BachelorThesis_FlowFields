@@ -40,7 +40,6 @@ public class Grid
         {
             for (int z = 0; z < gridArray.GetLength(1); z++)
             {
-                Debug.Log("Test");
                 gridArray[x, z].SetNeighbors();
             }
         }

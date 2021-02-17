@@ -24,6 +24,7 @@ public class NPC : MonoBehaviour
 
     // TEMP
     public float targetRadius;
+    public float arriveRadius;
 
     private void Start()
     {
@@ -56,14 +57,28 @@ public class NPC : MonoBehaviour
         {
             Cell currCell = GridCreator.grid.getCellFromPosition(transform.position.x, transform.position.z);
             currMaxSpeed = maxSpeed * ((float)(byte.MaxValue - currCell.GetCost()) / (float)byte.MaxValue);
+            animator.speed = 1.0f;
 
             if (FlowFieldManager.Instance.getDestinationCell() != null)
             {
                 float dstToDestination = (new Vector3(FlowFieldManager.Instance.getDestinationCell().xPos, 0.0f, FlowFieldManager.Instance.getDestinationCell().zIndex) - transform.position).magnitude;
 
-                if (dstToDestination < targetRadius)
+                if (dstToDestination <= targetRadius)
                 {
                     rb.velocity = Vector3.zero;
+                }
+                else if(dstToDestination > targetRadius && dstToDestination < arriveRadius)
+                {
+                    velocity = currCell.GetFlowFieldDirection(flowmapIndex);
+                    rb.AddForce(velocity);
+
+                    currMaxSpeed *= ((dstToDestination - targetRadius) / (arriveRadius - targetRadius));
+                    animator.speed = ((dstToDestination - targetRadius) / (arriveRadius - targetRadius));
+
+                    if (rb.velocity.magnitude > currMaxSpeed)
+                    {
+                        rb.velocity = rb.velocity.normalized * currMaxSpeed;
+                    }
                 }
                 else
                 {
@@ -101,7 +116,8 @@ public class NPC : MonoBehaviour
         GUIStyle style = new GUIStyle(GUI.skin.label);
         style.alignment = TextAnchor.MiddleCenter;
 
-        Handles.Label(transform.position + new Vector3(0.0f, 1.1f, 0.0f), flowmapIndex.ToString());
+        //Handles.Label(transform.position + new Vector3(0.0f, 1.1f, 0.0f), flowmapIndex.ToString());
+        Handles.Label(transform.position + new Vector3(0.0f, 1.1f, 0.0f), currMaxSpeed.ToString());
     }
 #endif
 

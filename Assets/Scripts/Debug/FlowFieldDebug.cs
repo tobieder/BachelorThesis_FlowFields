@@ -43,13 +43,13 @@ public class FlowFieldDebug : MonoBehaviour
             case DisplayInfo.Integration:
                 foreach (Cell cell in GridCreator.grid.GetGridArray())
                 {
-                    Handles.Label(new Vector3(cell.xPos, 0.0f, cell.zPos), cell.GetBestCost().ToString(), style);
+                    Handles.Label(new Vector3(cell.xPos, 0.0f, cell.zPos), cell.GetIntegration().ToString(), style);
                 };
                 break;
             case DisplayInfo.FlowFieldDirection:
                 foreach (Cell cell in GridCreator.grid.GetGridArray())
                 {
-                    DrawArrow.ForDebug(new Vector3(cell.xPos, 0.0f, cell.zPos), cell.GetFlowFieldDirection(flowFieldLayer), Color.red);
+                    DrawArrow.ForDebug(new Vector3(cell.xPos, 0.0f, cell.zPos), cell.GetFlowFieldDirection(flowFieldLayer).normalized * 0.5f, Color.red);
                 };
                 break;
             default:

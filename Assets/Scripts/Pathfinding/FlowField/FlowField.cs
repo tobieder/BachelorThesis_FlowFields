@@ -13,6 +13,7 @@ public class FlowField
 
     public void CreateIntegrationField(byte _flowMapIndex, Cell _destination)
     {
+        float startTime = Time.realtimeSinceStartup;
         ResetFlowField();
 
         destination = _destination;
@@ -20,7 +21,7 @@ public class FlowField
         byte oldCost = destination.GetCost();
 
         destination.SetCost(0);
-        destination.SetBestCost(0);
+        destination.SetIntegration(0);
 
         Queue<Cell> cellsToCheck = new Queue<Cell>();
 
@@ -39,9 +40,9 @@ public class FlowField
                 {
                     continue;
                 }
-                if (neighbor.GetCost() + currCell.GetBestCost() < neighbor.GetBestCost())
+                if (neighbor.GetCost() + currCell.GetIntegration() < neighbor.GetIntegration())
                 {
-                    neighbor.SetBestCost((ushort)(neighbor.GetCost() + currCell.GetBestCost()));
+                    neighbor.SetIntegration((ushort)(neighbor.GetCost() + currCell.GetIntegration()));
                     cellsToCheck.Enqueue(neighbor);
                 }
             }
@@ -50,6 +51,8 @@ public class FlowField
         destination.SetCost(oldCost);
 
         CreateFlowField(_flowMapIndex);
+
+        Debug.Log("CreateIntegrationField Execution Time: " + (Time.realtimeSinceStartup - startTime));
     }
 
     public void CreateFlowField(byte _flowMapIndex)
@@ -61,13 +64,13 @@ public class FlowField
                 //List<Cell> neighbors = GetNeighbors(cell.xIndex, cell.zIndex, true);
                 List<Cell> neighbors = cell.GetNeighbors();
 
-                ushort bestCost = cell.GetBestCost();
+                ushort bestCost = cell.GetIntegration();
 
                 foreach (Cell neighbor in neighbors)
                 {
-                    if (neighbor.GetBestCost() < bestCost)
+                    if (neighbor.GetIntegration() < bestCost)
                     {
-                        bestCost = neighbor.GetBestCost();
+                        bestCost = neighbor.GetIntegration();
                         cell.SetFlowFieldDirection(_flowMapIndex, new Vector3(neighbor.xPos - cell.xPos, 0.0f, neighbor.zPos - cell.zPos).normalized);
                     }
                 }
@@ -113,7 +116,7 @@ public class FlowField
     {
         foreach(Cell cell in GridCreator.grid.GetGridArray())
         {
-            cell.SetBestCost(ushort.MaxValue);
+            cell.SetIntegration(ushort.MaxValue);
         }
     }
 }
