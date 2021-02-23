@@ -11,9 +11,14 @@ public class FlowField
 
     }
 
-    public void CreateIntegrationField(byte _flowMapIndex, Cell _destination)
+    public void FlowFieldPathfinding(byte _flowMapIndex, Cell _destination)
     {
-        float startTime = Time.realtimeSinceStartup;
+        CreateIntegrationField(_destination);
+        CreateFlowField(_flowMapIndex);
+    }
+
+    private void CreateIntegrationField(Cell _destination)
+    {
         ResetFlowField();
 
         destination = _destination;
@@ -49,13 +54,9 @@ public class FlowField
         }
 
         destination.SetCost(oldCost);
-
-        CreateFlowField(_flowMapIndex);
-
-        Debug.Log("CreateIntegrationField Execution Time: " + (Time.realtimeSinceStartup - startTime));
     }
 
-    public void CreateFlowField(byte _flowMapIndex)
+    private void CreateFlowField(byte _flowMapIndex)
     {
         foreach(Cell cell in GridCreator.grid.GetGridArray())
         {
@@ -80,36 +81,6 @@ public class FlowField
                 cell.SetFlowFieldDirection(_flowMapIndex, new Vector3(0.0f, 0.0f, 0.0f));
             }
         }
-    }
-
-    private List<Cell> GetNeighbors(int _xPos, int _zPos, bool _useOrdinalDirections)
-    {
-        List<Cell> neighbors = new List<Cell>();
-
-        Cell currCell;
-
-        currCell = GridCreator.grid.getCell(_xPos + 1, _zPos + 0);
-        if (currCell != null) neighbors.Add(currCell);
-        currCell = GridCreator.grid.getCell(_xPos - 1, _zPos + 0);
-        if (currCell != null) neighbors.Add(currCell);
-        currCell = GridCreator.grid.getCell(_xPos + 0, _zPos + 1);
-        if (currCell != null) neighbors.Add(currCell);
-        currCell = GridCreator.grid.getCell(_xPos + 0, _zPos - 1);
-        if (currCell != null) neighbors.Add(currCell);
-
-        if(_useOrdinalDirections)
-        {
-            currCell = GridCreator.grid.getCell(_xPos + 1, _zPos + 1);
-            if (currCell != null) neighbors.Add(currCell);
-            currCell = GridCreator.grid.getCell(_xPos + 1, _zPos - 1);
-            if (currCell != null) neighbors.Add(currCell);
-            currCell = GridCreator.grid.getCell(_xPos - 1, _zPos + 1);
-            if (currCell != null) neighbors.Add(currCell);
-            currCell = GridCreator.grid.getCell(_xPos - 1, _zPos - 1);
-            if (currCell != null) neighbors.Add(currCell);
-        }
-
-        return neighbors;
     }
 
     private void ResetFlowField()

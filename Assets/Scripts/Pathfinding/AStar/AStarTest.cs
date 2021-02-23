@@ -27,6 +27,7 @@ public class AStarTest : MonoBehaviour
                 if (clickedCell != null)
                 {
                     Debug.Log(clickedCell.ToString());
+                    float averagePathLength = 0.0f;
                     float startTime = Time.realtimeSinceStartup;
                     foreach (KeyValuePair<int, GameObject> npc in SelectedDictionary.selectedDictionary)
                     {
@@ -34,19 +35,17 @@ public class AStarTest : MonoBehaviour
                         Vector3 pos = new Vector3(npc.Value.GetComponentInParent<NPC>().transform.position.x, 0.0f, npc.Value.GetComponentInParent<NPC>().transform.position.z);
                         List<Cell> path = pathfinding.FindPath(GridCreator.grid.getCellFromPosition(pos.x, pos.z), clickedCell);
 
-                        /*
                         if (path != null)
                         {
+                            averagePathLength += path.Count;
                             for (int i = 0; i < path.Count - 1; i++)
                             {
                                 //Debug.DrawLine(new Vector3(path[i].xPos, 0.0f, path[i].zPos) * 10f + Vector3.one * 5f, new Vector3(path[i + 1].xPos, 0.0f, path[i + 1].zPos) * 10f + Vector3.one * 5f, Color.green, 1000.0f);
                                 Debug.DrawLine(new Vector3(path[i].xPos, 0.0f, path[i].zPos), new Vector3(path[i + 1].xPos, 0.0f, path[i + 1].zPos), Color.green, 10.0f);
                             }
                         }
-                        */
                     }
                     float endTime = Time.realtimeSinceStartup;
-                    Debug.Log("A*-Algorithm for " + SelectedDictionary.selectedDictionary.Count + " Paths took: " + (endTime - startTime) + " seconds.");
                 }
             }
         

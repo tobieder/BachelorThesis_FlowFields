@@ -66,7 +66,11 @@ public class FlowFieldManager : MonoBehaviour
                 destinationCell = getClickedCell();
                 if (destinationCell != null)
                 {
-                    flowField.CreateIntegrationField(indexToUse, destinationCell);
+                    float startTime = Time.realtimeSinceStartup;
+
+                    flowField.FlowFieldPathfinding(indexToUse, destinationCell);
+
+                    float endTime = Time.realtimeSinceStartup;
                 }
 
                 placedFlags.Add(indexToUse, Instantiate<GameObject>(targetFlag, new Vector3(destinationCell.xPos, 0.0f, destinationCell.zPos), Quaternion.Euler(-90.0f, Random.Range(0.0f, 360.0f), 0.0f)));
