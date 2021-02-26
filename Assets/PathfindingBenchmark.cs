@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
-public enum Benchmark { AStarDistance, AStarUnits, FlowFields, None};
+public enum Benchmark { None, FlowFields, AStarDistance, AStarUnits };
 
 public class PathfindingBenchmark : MonoBehaviour
 {
@@ -13,6 +14,19 @@ public class PathfindingBenchmark : MonoBehaviour
     [SerializeField]
     private Benchmark benchmarkType;
 
+    bool benchmarkRunning = false;
+
+    [SerializeField]
+    private Window_Graph window_graph;
+
+    [SerializeField]
+    private RectTransform informationPanel;
+    [SerializeField]
+    private TMP_Dropdown dropdown;
+    [SerializeField]
+    Button startButton;
+    [SerializeField]
+    TMP_InputField inputField;
     [SerializeField]
     private TextMeshProUGUI destination;
     [SerializeField]
@@ -32,13 +46,18 @@ public class PathfindingBenchmark : MonoBehaviour
 
     int units = 1;
 
-    int mapSize = 8192/2;
-    Grid grid;
+    int mapSize = 100;
+    Grid flowFieldGrid;
+    Grid aStarUnitsGrid;
+    Grid aStarDistanceGrid;
 
-    private const int distanceArrayMaxWidth = 4;
     private List<float>[] distanceAStarExecutionTimes = new List<float>[401];
 
     bool distanceAStarFinished = false;
+
+    private int maxFlowFieldMapSize = 1;
+    private int maxXValue = 1;
+    private int maxUnits = 1;
     // -----
 
     // Headers 
@@ -49,16 +68,12 @@ public class PathfindingBenchmark : MonoBehaviour
 
     int concurrentCoroutines;
 
-    // TEMP
-    int oldx = 400;
-    int oldz = 400;
+    List<float> flowFieldValues = new List<float>();
+    List<float> astarDistanceValues = new List<float>();
+    List<float> astarUnitsValues = new List<float>();
 
     void Start()
     {
-        if(benchmarkType == Benchmark.None)
-        {
-            Destroy(this.gameObject);
-        }
         astar = new AStarPathfinding();
         flowfield = new FlowField();
         concurrentCoroutines = SystemInfo.processorCount - 1;
@@ -68,38 +83,169 @@ public class PathfindingBenchmark : MonoBehaviour
             distanceAStarExecutionTimes[i] = new List<float>();
         }
 
-        if(overwriteFile)
+        HandleInputData(0);
+    }
+
+    private void Update()
+    {
+        if (benchmarkRunning)
         {
             switch (benchmarkType)
             {
-                case Benchmark.AStarDistance: CSVManager.CreateData("AStarBenchmarkDistance.csv", ma_DistanceHeaders); ; break;
-                case Benchmark.AStarUnits: CSVManager.CreateData("AStarBenchmarkUnits.csv", ma_UnitsHeaders); break;
-                case Benchmark.FlowFields: CSVManager.CreateData("FlowFieldsBenchmark.csv", ma_FlowFieldsHeaders); break;
                 case Benchmark.None: break;
+                case Benchmark.AStarDistance: AStarDistance(); break;
+                case Benchmark.AStarUnits: AStarUnits(); break;
+                case Benchmark.FlowFields: FlowFields(); break;
                 default: Debug.LogError("Unknown Benchmark Type."); break;
             }
         }
     }
 
-    private void Update()
+    public void HandleInputData (int val)
     {
+        benchmarkType = (Benchmark)val;
+
         switch(benchmarkType)
         {
-            case Benchmark.AStarDistance: AStarDistance(); break;
-            case Benchmark.AStarUnits: AStarUnits(); break;
-            case Benchmark.FlowFields: FlowFields(); break;
-            default: Debug.LogError("Unknown Benchmark Type."); break;
+            case Benchmark.None:
+                {
+                    informationPanel.sizeDelta = new Vector2(0.0f, 100);
+
+
+                    startButton.gameObject.SetActive(false);
+                    inputField.gameObject.SetActive(false);
+
+                    destination.transform.parent.gameObject.SetActive(false);
+                    time.transform.parent.gameObject.SetActive(false);
+                    unitsUI.transform.parent.gameObject.SetActive(false);
+                    mapSizeUI.transform.parent.gameObject.SetActive(false);
+                    break;
+                }
+            case Benchmark.FlowFields:
+                {
+                    informationPanel.sizeDelta = new Vector2(0.0f, 300);
+
+                    startButton.gameObject.SetActive(true);
+                    inputField.gameObject.SetActive(true);
+                    inputField.text = "";
+                    inputField.placeholder.GetComponent<TextMeshProUGUI>().text = "Enter max. Grid-Size ...";
+
+                    destination.transform.parent.gameObject.SetActive(false);
+                    time.transform.parent.gameObject.SetActive(true);
+                    //time.transform.parent.GetComponent<RectTransform>().anchoredPosition = new Vector2(0.0f, -150.0f);
+                    unitsUI.transform.parent.gameObject.SetActive(false);
+                    mapSizeUI.transform.parent.gameObject.SetActive(true);
+                    //mapSizeUI.transform.parent.GetComponent<RectTransform>().anchoredPosition = new Vector2(0.0f, -200.0f);
+                    break;
+                }
+            case Benchmark.AStarDistance:
+                {
+                    informationPanel.sizeDelta = new Vector2(0.0f, 300);
+
+                    startButton.gameObject.SetActive(true);
+                    inputField.gameObject.SetActive(true);
+                    inputField.text = "";
+                    inputField.placeholder.GetComponent<TextMeshProUGUI>().text = "Enter max. X-Value ...";
+
+                    destination.transform.parent.gameObject.SetActive(true);
+                    //destination.transform.parent.GetComponent<RectTransform>().anchoredPosition = new Vector2(0.0f, -200.0f);
+                    time.transform.parent.gameObject.SetActive(true);
+                    //time.transform.parent.GetComponent<RectTransform>().anchoredPosition = new Vector2(0.0f, -150.0f);
+                    unitsUI.transform.parent.gameObject.SetActive(false);
+                    mapSizeUI.transform.parent.gameObject.SetActive(false);
+                    break;
+                }
+            case Benchmark.AStarUnits:
+                {
+                    informationPanel.sizeDelta = new Vector2(0.0f, 300);
+
+                    startButton.gameObject.SetActive(true);
+                    inputField.gameObject.SetActive(true);
+                    inputField.text = "";
+                    inputField.placeholder.GetComponent<TextMeshProUGUI>().text = "Enter max. Unit-Count ...";
+
+                    destination.transform.parent.gameObject.SetActive(false);
+                    time.transform.parent.gameObject.SetActive(true);
+                    //time.transform.parent.GetComponent<RectTransform>().anchoredPosition = new Vector2(0.0f, -150.0f);
+                    unitsUI.transform.parent.gameObject.SetActive(true);
+                    //unitsUI.transform.parent.GetComponent<RectTransform>().anchoredPosition = new Vector2(0.0f, -200.0f);
+                    mapSizeUI.transform.parent.gameObject.SetActive(false);
+                    break;
+                }
         }
+    }
+
+    public void StartBenchmark()
+    {
+
+        if (inputField.text != "")
+        {
+            switch (benchmarkType)
+            {
+                case Benchmark.None: break;
+                case Benchmark.FlowFields: maxFlowFieldMapSize = int.Parse(inputField.text); break;
+                case Benchmark.AStarDistance: distanceAStarFinished = false; maxXValue = int.Parse(inputField.text); break;
+                case Benchmark.AStarUnits: maxUnits = int.Parse(inputField.text); break;
+                default: Debug.LogError("Unknown Benchmark Type."); break;
+            }
+        }
+        else
+        {
+            inputField.placeholder.GetComponent<TextMeshProUGUI>().text = "<color=red>Enter a value!</color>";
+            return;
+        }
+
+        dropdown.interactable = false;
+        startButton.interactable = false;
+        inputField.interactable = false;
+        if (overwriteFile)
+        {
+            switch (benchmarkType)
+            {
+                case Benchmark.AStarDistance:
+                    {
+                        aStarDistanceGrid = new Grid(400, 400, 1.0f);
+                        InitializeNeighborsMultithreaded(aStarDistanceGrid.GetGridArray());
+                        CSVManager.CreateData("AStarBenchmarkDistance.csv", ma_DistanceHeaders); 
+                        break;
+                    }
+                case Benchmark.AStarUnits:
+                    {
+                        aStarUnitsGrid = new Grid(400, 400, 1.0f);
+                        InitializeNeighborsMultithreaded(aStarUnitsGrid.GetGridArray());
+                        CSVManager.CreateData("AStarBenchmarkUnits.csv", ma_UnitsHeaders); 
+                        break;
+                    }
+                case Benchmark.FlowFields:
+                    {
+                        CSVManager.CreateData("FlowFieldsBenchmark.csv", ma_FlowFieldsHeaders); 
+                        break;
+                    }
+                case Benchmark.None: break;
+                default: Debug.LogError("Unknown Benchmark Type."); break;
+            }
+        }
+
+        benchmarkRunning = true;
+    }
+
+    private void FinishedBenchmark()
+    {
+        dropdown.interactable = true;
+        startButton.interactable = true;
+        inputField.interactable = true;
+
+        benchmarkRunning = false;
     }
 
     #region FlowFields
 
     private void FlowFields()
     {
-        if (mapSize <= 8192)
+        if (mapSize <= maxFlowFieldMapSize)
         {
-            grid = new Grid(mapSize, mapSize, 1.0f);
-            grid.InitializeNeighbors();
+            flowFieldGrid = new Grid(mapSize, mapSize, 1.0f);
+            InitializeNeighborsMultithreaded(flowFieldGrid.GetGridArray());
 
             Debug.Log(mapSize);
             float averageExecutionTime = 0.0f;
@@ -107,7 +253,7 @@ public class PathfindingBenchmark : MonoBehaviour
             for (int i = 0; i < byte.MaxValue; i++)
             {
                 float startTime = Time.realtimeSinceStartup;
-                flowfield.FlowFieldPathfinding((byte)i, grid.getCell(0, 0));
+                flowfield.FlowFieldPathfinding(flowFieldGrid, (byte)i, flowFieldGrid.getCell(0, 0));
                 float endTime = Time.realtimeSinceStartup;
 
                 averageExecutionTime += (endTime - startTime);
@@ -117,17 +263,40 @@ public class PathfindingBenchmark : MonoBehaviour
 
             string[] data = new string[2]
             {
-                grid.GetWidth().ToString() + "x" + grid.GetHeight().ToString(),
+                flowFieldGrid.GetWidth().ToString() + "x" + flowFieldGrid.GetHeight().ToString(),
                 averageExecutionTime.ToString()
             };
             CSVManager.AppendToData("FlowFieldsBenchmark.csv", ma_FlowFieldsHeaders, data);
+
+            flowFieldValues.Add(averageExecutionTime);
 
 
             destination.text = "0, 0";
             time.text = averageExecutionTime.ToString("F4") + "s";
             mapSizeUI.text = mapSize + ", " + mapSize;
 
-            mapSize *= 2;
+            mapSize += 100;
+        }
+        else
+        {
+            FinishedBenchmark();
+
+            window_graph.gameObject.SetActive(true);
+            window_graph.ShowGraph(flowFieldValues, -1, (int _i) => "" + ((_i * 100) + 100), (float _f) => _f.ToString("F4") + "s");
+
+            mapSize = 100;
+            flowFieldValues.Clear();
+        }
+    }
+
+    public void InitializeNeighborsMultithreaded(Cell[,] _gridArray)
+    {
+        for (int x = 0; x < _gridArray.GetLength(0); x++)
+        {
+            for (int z = 0; z < _gridArray.GetLength(1); z++)
+            {
+                StartCoroutine(_gridArray[x, z].SetNeighborsMultithreaded());
+            }
         }
     }
 
@@ -137,24 +306,47 @@ public class PathfindingBenchmark : MonoBehaviour
 
     private void AStarUnits()
     {
-        float startTime = Time.realtimeSinceStartup;
-        for (int i = 0; i < units; i++)
+        if (units <= maxUnits)
         {
-            List<Cell> path = astar.FindPath(GridCreator.grid.getCellFromPosition(0, 0), GridCreator.grid.getCell(x, z));
-        }
-        float endTime = Time.realtimeSinceStartup;
+            float averageExecutionTime = 0.0f;
+            for (int i = 0; i < 10; i++)
+            {
+                float startTime = Time.realtimeSinceStartup;
+                for (int j = 0; j < units; j++)
+                {
+                    List<Cell> path = astar.FindPath(aStarUnitsGrid, aStarUnitsGrid.getCell(0, 0), aStarUnitsGrid.getCell(200, 200));
+                }
+                float endTime = Time.realtimeSinceStartup;
 
-        string[] data = new string[2]
-        {
+                averageExecutionTime += (endTime - startTime);
+            }
+
+            averageExecutionTime /= 10.0f;
+
+            string[] data = new string[2]
+            {
                         units.ToString(),
-                        (endTime - startTime).ToString()
-        };
-        CSVManager.AppendToData("AStarBenchmarkUnits.csv", ma_UnitsHeaders, data);
-        destination.text = 200 + ", " + 200;
-        time.text = (endTime - startTime).ToString("F4") + "s";
-        unitsUI.text = units.ToString();
+                        averageExecutionTime.ToString()
+            };
+            CSVManager.AppendToData("AStarBenchmarkUnits.csv", ma_UnitsHeaders, data);
+            destination.text = 200 + ", " + 200;
+            time.text = averageExecutionTime.ToString("F4") + "s";
+            unitsUI.text = units.ToString();
 
-        units++;
+            astarUnitsValues.Add(averageExecutionTime);
+
+            units++;
+        }
+        else
+        {
+            FinishedBenchmark();
+
+            window_graph.gameObject.SetActive(true);
+            window_graph.ShowGraph(astarUnitsValues, -1, (int _i) => "" + (_i + 1), (float _f) => _f.ToString("F4") + "s");
+
+            units = 1;
+            astarUnitsValues.Clear();
+        }
     }
 
     #endregion
@@ -166,17 +358,11 @@ public class PathfindingBenchmark : MonoBehaviour
         {
             for (int i = 0; i < concurrentCoroutines; i++)
             {
-                if (x < distanceArrayMaxWidth)
+                if (x < maxXValue)
                 {
                     pathfinding = new Task(AStarPathfindingDistance(x, z));
-                    if (oldx == x && oldz == z)
-                    {
-                        Debug.Break();
-                    }
-                    oldx = x;
-                    oldz = z;
 
-                    if (z < GridCreator.grid.GetHeight() - 1)
+                    if (z < aStarDistanceGrid.GetHeight() - 1)
                     {
                         z++;
                     }
@@ -195,6 +381,11 @@ public class PathfindingBenchmark : MonoBehaviour
             if(distanceAStarFinished)
             {
                 new Task(CalculateAverageAndSaveToFile());
+
+                x = 0;
+                z = 0; 
+
+                FinishedBenchmark();
             }
         }
     }
@@ -202,7 +393,7 @@ public class PathfindingBenchmark : MonoBehaviour
     private IEnumerator AStarPathfindingDistance(int _x, int _z)
     {
         float startTime = Time.realtimeSinceStartup;
-        List<Cell> path = astar.FindPath(GridCreator.grid.getCellFromPosition(0, 0), GridCreator.grid.getCell(_x, _z));
+        List<Cell> path = astar.FindPath(aStarDistanceGrid, aStarDistanceGrid.getCellFromPosition(0, 0), aStarDistanceGrid.getCell(_x, _z));
         float endTime = Time.realtimeSinceStartup;
 
         /*
@@ -237,8 +428,6 @@ public class PathfindingBenchmark : MonoBehaviour
             }
             averageExecutionTime /= distanceAStarExecutionTimes[i].Count;
 
-            Debug.Log("Average Execution Time for distance " + i + " is:" + averageExecutionTime);
-
             string[] data = new string[2]
             {
                         i.ToString(),
@@ -246,8 +435,17 @@ public class PathfindingBenchmark : MonoBehaviour
             };
             CSVManager.AppendToData("AStarBenchmarkDistance.csv", ma_DistanceHeaders, data);
 
+            astarDistanceValues.Add(averageExecutionTime);
+
             yield return null;
         }
+
+        window_graph.gameObject.SetActive(true);
+        window_graph.ShowGraph(astarDistanceValues, -1, (int _i) => "" + (_i + 1), (float _f) => _f.ToString("F4") + "s");
+
+        x = 0;
+        z = 0;
+        astarDistanceValues.Clear();
 
         yield return null;
     }

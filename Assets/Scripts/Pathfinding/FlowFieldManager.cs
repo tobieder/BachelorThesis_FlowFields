@@ -68,7 +68,7 @@ public class FlowFieldManager : MonoBehaviour
                 {
                     float startTime = Time.realtimeSinceStartup;
 
-                    flowField.FlowFieldPathfinding(indexToUse, destinationCell);
+                    flowField.FlowFieldPathfinding(GridCreator.grid, indexToUse, destinationCell);
 
                     float endTime = Time.realtimeSinceStartup;
                 }

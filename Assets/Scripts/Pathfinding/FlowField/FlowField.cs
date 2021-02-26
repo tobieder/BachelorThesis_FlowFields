@@ -5,14 +5,17 @@ using UnityEngine;
 public class FlowField
 {
     private Cell destination;
+    private Grid grid;
 
     public FlowField()
     {
 
     }
 
-    public void FlowFieldPathfinding(byte _flowMapIndex, Cell _destination)
+    public void FlowFieldPathfinding(Grid _grid, byte _flowMapIndex, Cell _destination)
     {
+        grid = _grid;
+
         CreateIntegrationField(_destination);
         CreateFlowField(_flowMapIndex);
     }
@@ -58,7 +61,7 @@ public class FlowField
 
     private void CreateFlowField(byte _flowMapIndex)
     {
-        foreach(Cell cell in GridCreator.grid.GetGridArray())
+        foreach(Cell cell in grid.GetGridArray())
         {
             if (cell.GetCost() != byte.MaxValue)
             {
@@ -85,7 +88,7 @@ public class FlowField
 
     private void ResetFlowField()
     {
-        foreach(Cell cell in GridCreator.grid.GetGridArray())
+        foreach(Cell cell in grid.GetGridArray())
         {
             cell.SetIntegration(ushort.MaxValue);
         }

@@ -13,6 +13,8 @@ public enum GroundType
 public class Cell
 {
     // General
+    Grid grid;
+
     public float xPos;
     public float zPos;
 
@@ -38,9 +40,11 @@ public class Cell
 
     private Cell prevCell;
 
-    public Cell(float _xPos, float _zPos, int _xIndex, int _zIndex, byte _cost)
+    public Cell(Grid _grid, float _xPos, float _zPos, int _xIndex, int _zIndex, byte _cost)
     {
         // General
+        grid = _grid;
+
         xPos = _xPos;
         zPos = _zPos;
         xIndex = _xIndex;
@@ -100,41 +104,85 @@ public class Cell
 
         if (this.xIndex - 1 >= 0)
         {
-            neighbors.Add(GridCreator.grid.getCell(this.xIndex - 1, this.zIndex));
+            neighbors.Add(grid.getCell(this.xIndex - 1, this.zIndex));
 
             if (this.zIndex - 1 >= 0)
             {
-                neighbors.Add(GridCreator.grid.getCell(this.xIndex - 1, this.zIndex - 1));
+                neighbors.Add(grid.getCell(this.xIndex - 1, this.zIndex - 1));
             }
-            if (this.zIndex + 1 < GridCreator.grid.GetHeight())
+            if (this.zIndex + 1 < grid.GetHeight())
             {
-                neighbors.Add(GridCreator.grid.getCell(this.xIndex - 1, this.zIndex + 1));
+                neighbors.Add(grid.getCell(this.xIndex - 1, this.zIndex + 1));
             }
         }
-        if (this.xIndex + 1 < GridCreator.grid.GetWidth())
+        if (this.xIndex + 1 < grid.GetWidth())
         {
-            neighbors.Add(GridCreator.grid.getCell(this.xIndex + 1, this.zIndex));
+            neighbors.Add(grid.getCell(this.xIndex + 1, this.zIndex));
 
             if (this.zIndex - 1 >= 0)
             {
-                neighbors.Add(GridCreator.grid.getCell(this.xIndex + 1, this.zIndex - 1));
+                neighbors.Add(grid.getCell(this.xIndex + 1, this.zIndex - 1));
             }
-            if (this.zIndex + 1 < GridCreator.grid.GetHeight())
+            if (this.zIndex + 1 < grid.GetHeight())
             {
-                neighbors.Add(GridCreator.grid.getCell(this.xIndex + 1, this.zIndex + 1));
+                neighbors.Add(grid.getCell(this.xIndex + 1, this.zIndex + 1));
             }
         }
 
         if (this.zIndex - 1 >= 0)
         {
-            neighbors.Add(GridCreator.grid.getCell(this.xIndex, this.zIndex - 1));
+            neighbors.Add(grid.getCell(this.xIndex, this.zIndex - 1));
         }
-        if (this.zIndex + 1 < GridCreator.grid.GetHeight())
+        if (this.zIndex + 1 < grid.GetHeight())
         {
-            neighbors.Add(GridCreator.grid.getCell(this.xIndex, this.zIndex + 1));
+            neighbors.Add(grid.getCell(this.xIndex, this.zIndex + 1));
         }
 
         m_Neighbors = neighbors;
+    }
+
+    public IEnumerator SetNeighborsMultithreaded()
+    {
+        List<Cell> neighbors = new List<Cell>();
+
+        if (this.xIndex - 1 >= 0)
+        {
+            neighbors.Add(grid.getCell(this.xIndex - 1, this.zIndex));
+
+            if (this.zIndex - 1 >= 0)
+            {
+                neighbors.Add(grid.getCell(this.xIndex - 1, this.zIndex - 1));
+            }
+            if (this.zIndex + 1 < grid.GetHeight())
+            {
+                neighbors.Add(grid.getCell(this.xIndex - 1, this.zIndex + 1));
+            }
+        }
+        if (this.xIndex + 1 < grid.GetWidth())
+        {
+            neighbors.Add(grid.getCell(this.xIndex + 1, this.zIndex));
+
+            if (this.zIndex - 1 >= 0)
+            {
+                neighbors.Add(grid.getCell(this.xIndex + 1, this.zIndex - 1));
+            }
+            if (this.zIndex + 1 < grid.GetHeight())
+            {
+                neighbors.Add(grid.getCell(this.xIndex + 1, this.zIndex + 1));
+            }
+        }
+
+        if (this.zIndex - 1 >= 0)
+        {
+            neighbors.Add(grid.getCell(this.xIndex, this.zIndex - 1));
+        }
+        if (this.zIndex + 1 < grid.GetHeight())
+        {
+            neighbors.Add(grid.getCell(this.xIndex, this.zIndex + 1));
+        }
+
+        m_Neighbors = neighbors;
+        yield return null;
     }
 
     #endregion

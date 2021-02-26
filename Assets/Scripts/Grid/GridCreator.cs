@@ -32,6 +32,10 @@ public class GridCreator : MonoBehaviour
 
     private void Start()
     {
+        if(GameManager.instance != null && GameManager.instance.GetSelectedMapSize() != 0)
+        {
+            width = height = GameManager.instance.GetSelectedMapSize();
+        }
         InitialzeGrid();
     }
 

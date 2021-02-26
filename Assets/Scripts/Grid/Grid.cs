@@ -27,7 +27,7 @@ public class Grid
         {
             for (int z = 0; z < gridArray.GetLength(1); z++)
             {
-                gridArray[x, z] = new Cell(x * cellSize, z * cellSize, x, z, 1); // Get cost from ground texture
+                gridArray[x, z] = new Cell(this, x * cellSize, z * cellSize, x, z, 1); // Get cost from ground texture
 
                 gridArray[x, z].SetFlowFieldDirection(byte.MaxValue, new Vector3(0.0f, 0.0f, 0.0f));
             }

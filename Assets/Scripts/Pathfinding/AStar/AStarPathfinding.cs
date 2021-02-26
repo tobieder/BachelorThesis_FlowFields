@@ -15,23 +15,23 @@ public class AStarPathfinding
 
     }
 
-    public List<Cell> FindPath(Cell start, Cell end)
+    public List<Cell> FindPath(Grid _grid, Cell _start, Cell _end)
     {
-        openList = new List<Cell> { start };
+        openList = new List<Cell> { _start };
         closedList = new List<Cell>();
 
-        ResetCells();
+        ResetCells(_grid);
 
-        start.SetGCost(0);
-        start.SetHCost(CalculateDistanceCost(start, end));
-        start.CalculateFCost();
+        _start.SetGCost(0);
+        _start.SetHCost(CalculateDistanceCost(_start, _end));
+        _start.CalculateFCost();
 
         while(openList.Count > 0)
         {
             Cell currCell = GetLowestFCostCell(openList);
-            if(currCell == end)
+            if(currCell == _end)
             {
-                return CalculatePath(end);
+                return CalculatePath(_end);
             }
 
             openList.Remove(currCell);
@@ -57,7 +57,7 @@ public class AStarPathfinding
                 {
                     neighbourCell.SetPrevCell(currCell);
                     neighbourCell.SetGCost(tentativeGCost);
-                    neighbourCell.SetHCost(CalculateDistanceCost(neighbourCell, end));
+                    neighbourCell.SetHCost(CalculateDistanceCost(neighbourCell, _end));
                     neighbourCell.CalculateFCost();
 
                     if(!openList.Contains(neighbourCell))
@@ -90,49 +90,6 @@ public class AStarPathfinding
         return path;
     }
 
-    private List<Cell> GetNeighbours(Cell currCell)
-    {
-        List<Cell> neighbours = new List<Cell>();
-
-        if(currCell.xIndex - 1 >= 0)
-        {
-            neighbours.Add(GridCreator.grid.getCell(currCell.xIndex - 1, currCell.zIndex));
-
-            if (currCell.zIndex - 1 >= 0)
-            {
-                neighbours.Add(GridCreator.grid.getCell(currCell.xIndex - 1, currCell.zIndex - 1));
-            }
-            if (currCell.zIndex + 1 < GridCreator.grid.GetHeight())
-            {
-                neighbours.Add(GridCreator.grid.getCell(currCell.xIndex - 1, currCell.zIndex + 1));
-            }
-        }
-        if (currCell.xIndex + 1 < GridCreator.grid.GetWidth())
-        {
-            neighbours.Add(GridCreator.grid.getCell(currCell.xIndex + 1, currCell.zIndex));
-
-            if (currCell.zIndex - 1 >= 0)
-            {
-                neighbours.Add(GridCreator.grid.getCell(currCell.xIndex + 1, currCell.zIndex - 1));
-            }
-            if (currCell.zIndex + 1 < GridCreator.grid.GetHeight())
-            {
-                neighbours.Add(GridCreator.grid.getCell(currCell.xIndex + 1, currCell.zIndex + 1));
-            }
-        }
-
-        if (currCell.zIndex - 1 >= 0)
-        {
-            neighbours.Add(GridCreator.grid.getCell(currCell.xIndex, currCell.zIndex - 1));
-        }
-        if (currCell.zIndex + 1 < GridCreator.grid.GetHeight())
-        {
-            neighbours.Add(GridCreator.grid.getCell(currCell.xIndex, currCell.zIndex + 1));
-        }
-
-        return neighbours;
-    }
-
     private int CalculateDistanceCost(Cell a, Cell b)
     {
         float xDist = Mathf.Abs(b.xPos - a.xPos);
@@ -158,13 +115,13 @@ public class AStarPathfinding
         return lowestFCostCell;
     }
 
-    private void ResetCells()
+    private void ResetCells(Grid _grid)
     {
-        for (int x = 0; x < GridCreator.grid.GetWidth(); x++)
+        for (int x = 0; x < _grid.GetWidth(); x++)
         {
-            for (int z = 0; z < GridCreator.grid.GetHeight(); z++)
+            for (int z = 0; z < _grid.GetHeight(); z++)
             {
-                Cell currCell = GridCreator.grid.getCell(x, z);
+                Cell currCell = _grid.getCell(x, z);
                 currCell.SetGCost(int.MaxValue);
                 currCell.CalculateFCost();
                 currCell.SetPrevCell(null);

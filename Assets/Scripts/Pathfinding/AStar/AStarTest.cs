@@ -33,7 +33,7 @@ public class AStarTest : MonoBehaviour
                     {
                         //npc.Value.GetComponentInParent<NPC>().SetFlowMapIndex(indexToUse);
                         Vector3 pos = new Vector3(npc.Value.GetComponentInParent<NPC>().transform.position.x, 0.0f, npc.Value.GetComponentInParent<NPC>().transform.position.z);
-                        List<Cell> path = pathfinding.FindPath(GridCreator.grid.getCellFromPosition(pos.x, pos.z), clickedCell);
+                        List<Cell> path = pathfinding.FindPath(GridCreator.grid, GridCreator.grid.getCellFromPosition(pos.x, pos.z), clickedCell);
 
                         if (path != null)
                         {

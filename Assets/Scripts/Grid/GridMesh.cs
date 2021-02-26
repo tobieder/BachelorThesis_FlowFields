@@ -19,6 +19,8 @@ public class GridMesh : MonoBehaviour
         GridCreator gridCreator = GetComponent<GridCreator>();
 
         MeshUpdateEditor();
+
+
     }
 
     public void MeshUpdateEditor()
