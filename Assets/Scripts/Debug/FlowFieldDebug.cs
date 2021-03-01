@@ -7,6 +7,7 @@ using UnityEditor;
 public enum DisplayInfo
 {
     None,
+    Index,
     Cost,
     Integration,
     FlowFieldDirection
@@ -17,7 +18,7 @@ public class FlowFieldDebug : MonoBehaviour
 
     public DisplayInfo displayInfo;
 
-    public byte flowFieldLayer = 0;
+    public byte flowFieldLayer = byte.MaxValue;
 
     private void OnDrawGizmos()
     {
@@ -33,6 +34,12 @@ public class FlowFieldDebug : MonoBehaviour
         switch(displayInfo)
         {
             case DisplayInfo.None:
+                break;
+            case DisplayInfo.Index:
+                foreach (Cell cell in GridCreator.grid.GetGridArray())
+                {
+                    Handles.Label(new Vector3(cell.xPos, 0.0f, cell.zPos), "(" + cell.xIndex + ", " + cell.zIndex + ")", style);
+                };
                 break;
             case DisplayInfo.Cost:
                 foreach(Cell cell in GridCreator.grid.GetGridArray())

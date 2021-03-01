@@ -23,9 +23,9 @@ public class Grid
 
         Vector3 _gridOffset = new Vector3(cellSize, 0.0f, cellSize) * 0.5f;
 
-        for (int x = 0; x < gridArray.GetLength(0); x++)
+        for (int x = 0; x < width; x++)
         {
-            for (int z = 0; z < gridArray.GetLength(1); z++)
+            for (int z = 0; z < height; z++)
             {
                 gridArray[x, z] = new Cell(this, x * cellSize, z * cellSize, x, z, 1); // Get cost from ground texture
 

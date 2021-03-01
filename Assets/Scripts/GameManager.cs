@@ -38,8 +38,8 @@ public class GameManager : MonoBehaviour
     {
         loadingScreen.SetActive(true);
 
-        scenesLoading.Add(SceneManager.LoadSceneAsync((int)SceneIndexes.MENU, LoadSceneMode.Additive));
         scenesLoading.Add(SceneManager.UnloadSceneAsync((int)currentScene));
+        scenesLoading.Add(SceneManager.LoadSceneAsync((int)SceneIndexes.MENU, LoadSceneMode.Additive));
         currentScene = SceneIndexes.MENU;
 
         StartCoroutine(GetSceneLoadProgress());
@@ -49,8 +49,8 @@ public class GameManager : MonoBehaviour
     {
         loadingScreen.SetActive(true);
 
-        scenesLoading.Add(SceneManager.LoadSceneAsync((int)SceneIndexes.SANDBOX, LoadSceneMode.Additive));
         scenesLoading.Add(SceneManager.UnloadSceneAsync((int)currentScene));
+        scenesLoading.Add(SceneManager.LoadSceneAsync((int)SceneIndexes.SANDBOX, LoadSceneMode.Additive));
         currentScene = SceneIndexes.SANDBOX;
 
         StartCoroutine(GetSceneLoadProgress());
@@ -60,8 +60,8 @@ public class GameManager : MonoBehaviour
     {
         loadingScreen.SetActive(true);
 
-        scenesLoading.Add(SceneManager.LoadSceneAsync((int)SceneIndexes.BENCHMARK, LoadSceneMode.Additive));
         scenesLoading.Add(SceneManager.UnloadSceneAsync((int)currentScene));
+        scenesLoading.Add(SceneManager.LoadSceneAsync((int)SceneIndexes.BENCHMARK, LoadSceneMode.Additive));
         currentScene = SceneIndexes.BENCHMARK;
 
         StartCoroutine(GetSceneLoadProgress());

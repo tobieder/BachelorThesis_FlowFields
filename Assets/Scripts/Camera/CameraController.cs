@@ -9,7 +9,6 @@ public class CameraController : MonoBehaviour
     private static CameraController _instance;
     public static CameraController Instance { get { return _instance; } }
 
-    public Transform followTransform;
     public Transform cameraTransform;
 
     public float normalSpeed;
@@ -27,8 +26,6 @@ public class CameraController : MonoBehaviour
     private Quaternion newRotation;
     private Vector3 newZoom;
 
-    private Vector3 dragStartPosition;
-    private Vector3 dragCurrentPosition;
     private Vector3 rotateStartPosition;
     private Vector3 rotateCurrentPosition;
 
@@ -63,47 +60,18 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (followTransform != null)
-        {
-            transform.position = followTransform.position;
-        }
-        else
-        {
-            HandleMouseInput();
-            HandleMovementInput();
-            HandleInput();
-        }
-
-        if(Input.GetKeyDown(KeyCode.Escape))
-        {
-            followTransform = null;
-        }
+        HandleMouseInput();
+        HandleMovementInput();
+        HandleInput(); 
     }
 
     void HandleInput()
     {
-        newPosition.x = Mathf.Clamp(newPosition.x, 0.0f, 400.0f);
-        newPosition.z = Mathf.Clamp(newPosition.z, 0.0f, 400.0f);
+        newPosition.x = Mathf.Clamp(newPosition.x, 0.0f, maxWidth);
+        newPosition.z = Mathf.Clamp(newPosition.z, 0.0f, maxHeight);
 
         transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * movementTime);
         transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, Time.deltaTime * movementTime);
-
-        if(transform.position.x < 0)
-        {
-            transform.position = new Vector3(0.0f, 0.0f, transform.position.z);
-        }
-        else if(transform.position.x >= maxWidth)
-        {
-            transform.position = new Vector3(maxWidth, 0.0f, transform.position.z);
-        }
-        if (transform.position.z < 0)
-        {
-            transform.position = new Vector3(transform.position.x, 0.0f, 0.0f);
-        }
-        else if (transform.position.z >= maxHeight)
-        {
-            transform.position = new Vector3(transform.position.x, 0.0f, maxHeight);
-        }
 
         newZoom.y = Mathf.Clamp(newZoom.y, minZoom, maxZoom);
         newZoom.z = Mathf.Clamp(newZoom.z, -maxZoom, -minZoom);
@@ -120,36 +88,6 @@ public class CameraController : MonoBehaviour
 
         if (!EventSystem.current.IsPointerOverGameObject())
         {
-            /*
-            if (Input.GetMouseButtonDown(0))
-            {
-                Plane _plane = new Plane(Vector3.up, Vector3.zero);
-
-                Ray _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-                float _entry;
-
-                if (_plane.Raycast(_ray, out _entry))
-                {
-                    dragStartPosition = _ray.GetPoint(_entry);
-                }
-            }
-            if (Input.GetMouseButton(0))
-            {
-                Plane _plane = new Plane(Vector3.up, Vector3.zero);
-
-                Ray _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-                float _entry;
-
-                if (_plane.Raycast(_ray, out _entry))
-                {
-                    dragCurrentPosition = _ray.GetPoint(_entry);
-
-                    newPosition = transform.position + dragStartPosition - dragCurrentPosition;
-                }
-            }
-            */
             if (Input.GetMouseButtonDown(2))
             {
                 rotateStartPosition = Input.mousePosition;

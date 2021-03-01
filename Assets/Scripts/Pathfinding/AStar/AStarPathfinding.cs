@@ -97,7 +97,7 @@ public class AStarPathfinding
 
         float remaining = Mathf.Abs(xDist - zDist);
 
-        return (int)(MOVE_DIAGONAL_COST * Mathf.Min(xDist, zDist) + MOVE_STRAIGHT_COST * remaining);
+        return (int)((MOVE_DIAGONAL_COST * Mathf.Min(xDist, zDist)) + (MOVE_STRAIGHT_COST * remaining) + (a.GetCost() * 5));
     }
 
     private Cell GetLowestFCostCell(List<Cell> cellList)

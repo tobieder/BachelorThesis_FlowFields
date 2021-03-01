@@ -11,6 +11,8 @@ public class FlowFieldManager : MonoBehaviour
 
     [SerializeField]
     private GameObject targetFlag;
+    [SerializeField]
+    private Transform parent;
     private Dictionary<byte, GameObject> placedFlags;
 
     private FlowField flowField;
@@ -69,11 +71,12 @@ public class FlowFieldManager : MonoBehaviour
                     float startTime = Time.realtimeSinceStartup;
 
                     flowField.FlowFieldPathfinding(GridCreator.grid, indexToUse, destinationCell);
+                    StartCoroutine(FlowFieldDisplay.instance.CreateFlowFieldDirectionMesh(indexToUse, destinationCell));
 
                     float endTime = Time.realtimeSinceStartup;
                 }
 
-                placedFlags.Add(indexToUse, Instantiate<GameObject>(targetFlag, new Vector3(destinationCell.xPos, 0.0f, destinationCell.zPos), Quaternion.Euler(-90.0f, Random.Range(0.0f, 360.0f), 0.0f)));
+                placedFlags.Add(indexToUse, Instantiate<GameObject>(targetFlag, new Vector3(destinationCell.xPos, 0.0f, destinationCell.zPos), Quaternion.Euler(-90.0f, Random.Range(0.0f, 360.0f), 0.0f), parent));
 
                 CleanUpCurrentlyUsedFlowFields();
             }

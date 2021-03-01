@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 
 public class SpawnNPC : MonoBehaviour
 {
+    public Transform parent;
     public GameObject npc;
 
     void Start()
@@ -37,7 +38,7 @@ public class SpawnNPC : MonoBehaviour
             }
             else
             {
-                Instantiate(npc, hit.point, Quaternion.Euler(1.0f, 0.0f, 0.0f));
+                Instantiate(npc, hit.point, Quaternion.Euler(1.0f, 0.0f, 0.0f), parent);
             }
         }
     }

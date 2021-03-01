@@ -17,7 +17,11 @@ public class PathfindingBenchmark : MonoBehaviour
     bool benchmarkRunning = false;
 
     [SerializeField]
-    private Window_Graph window_graph;
+    private Window_Graph flowFieldGraph;
+    [SerializeField]
+    private Window_Graph aStarDistanceGraph;
+    [SerializeField]
+    private Window_Graph aStarUnitsGraph;
 
     [SerializeField]
     private RectTransform informationPanel;
@@ -123,6 +127,10 @@ public class PathfindingBenchmark : MonoBehaviour
                 }
             case Benchmark.FlowFields:
                 {
+                    flowFieldGraph.gameObject.SetActive(true);
+                    aStarDistanceGraph.gameObject.SetActive(false);
+                    aStarUnitsGraph.gameObject.SetActive(false);
+
                     informationPanel.sizeDelta = new Vector2(0.0f, 300);
 
                     startButton.gameObject.SetActive(true);
@@ -140,6 +148,10 @@ public class PathfindingBenchmark : MonoBehaviour
                 }
             case Benchmark.AStarDistance:
                 {
+                    flowFieldGraph.gameObject.SetActive(false);
+                    aStarDistanceGraph.gameObject.SetActive(true);
+                    aStarUnitsGraph.gameObject.SetActive(false);
+
                     informationPanel.sizeDelta = new Vector2(0.0f, 300);
 
                     startButton.gameObject.SetActive(true);
@@ -157,6 +169,10 @@ public class PathfindingBenchmark : MonoBehaviour
                 }
             case Benchmark.AStarUnits:
                 {
+                    flowFieldGraph.gameObject.SetActive(false);
+                    aStarDistanceGraph.gameObject.SetActive(false);
+                    aStarUnitsGraph.gameObject.SetActive(true);
+
                     informationPanel.sizeDelta = new Vector2(0.0f, 300);
 
                     startButton.gameObject.SetActive(true);
@@ -281,8 +297,11 @@ public class PathfindingBenchmark : MonoBehaviour
         {
             FinishedBenchmark();
 
-            window_graph.gameObject.SetActive(true);
-            window_graph.ShowGraph(flowFieldValues, -1, (int _i) => "" + ((_i * 100) + 100), (float _f) => _f.ToString("F4") + "s");
+            flowFieldGraph.gameObject.SetActive(true);
+            aStarDistanceGraph.gameObject.SetActive(false);
+            aStarUnitsGraph.gameObject.SetActive(false);
+
+            flowFieldGraph.ShowGraph(flowFieldValues, -1, (int _i) => "" + ((_i * 100) + 100), (float _f) => _f.ToString("F4") + "s");
 
             mapSize = 100;
             flowFieldValues.Clear();
@@ -341,8 +360,11 @@ public class PathfindingBenchmark : MonoBehaviour
         {
             FinishedBenchmark();
 
-            window_graph.gameObject.SetActive(true);
-            window_graph.ShowGraph(astarUnitsValues, -1, (int _i) => "" + (_i + 1), (float _f) => _f.ToString("F4") + "s");
+            aStarUnitsGraph.gameObject.SetActive(true);
+            flowFieldGraph.gameObject.SetActive(false);
+            aStarDistanceGraph.gameObject.SetActive(false);
+
+            aStarUnitsGraph.ShowGraph(astarUnitsValues, -1, (int _i) => "" + (_i + 1), (float _f) => _f.ToString("F4") + "s");
 
             units = 1;
             astarUnitsValues.Clear();
@@ -440,8 +462,11 @@ public class PathfindingBenchmark : MonoBehaviour
             yield return null;
         }
 
-        window_graph.gameObject.SetActive(true);
-        window_graph.ShowGraph(astarDistanceValues, -1, (int _i) => "" + (_i + 1), (float _f) => _f.ToString("F4") + "s");
+        aStarDistanceGraph.gameObject.SetActive(true);
+        flowFieldGraph.gameObject.SetActive(false);
+        aStarUnitsGraph.gameObject.SetActive(false);
+
+        aStarDistanceGraph.ShowGraph(astarDistanceValues, -1, (int _i) => "" + (_i + 1), (float _f) => _f.ToString("F4") + "s");
 
         x = 0;
         z = 0;

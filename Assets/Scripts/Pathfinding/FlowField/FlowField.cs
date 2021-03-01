@@ -7,6 +7,8 @@ public class FlowField
     private Cell destination;
     private Grid grid;
 
+    private float vectorIntensity = 10.0f;
+
     public FlowField()
     {
 
@@ -65,7 +67,6 @@ public class FlowField
         {
             if (cell.GetCost() != byte.MaxValue)
             {
-                //List<Cell> neighbors = GetNeighbors(cell.xIndex, cell.zIndex, true);
                 List<Cell> neighbors = cell.GetNeighbors();
 
                 ushort bestCost = cell.GetIntegration();
@@ -75,7 +76,7 @@ public class FlowField
                     if (neighbor.GetIntegration() < bestCost)
                     {
                         bestCost = neighbor.GetIntegration();
-                        cell.SetFlowFieldDirection(_flowMapIndex, new Vector3(neighbor.xPos - cell.xPos, 0.0f, neighbor.zPos - cell.zPos).normalized);
+                        cell.SetFlowFieldDirection(_flowMapIndex, new Vector3(neighbor.xPos - cell.xPos, 0.0f, neighbor.zPos - cell.zPos).normalized * vectorIntensity);
                     }
                 }
             }
