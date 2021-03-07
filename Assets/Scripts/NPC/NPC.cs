@@ -56,7 +56,8 @@ public class NPC : MonoBehaviour
         else
         {
             Cell currCell = GridCreator.grid.getCellFromPosition(transform.position.x, transform.position.z);
-            currMaxSpeed = maxSpeed * ((float)(byte.MaxValue - currCell.GetCost()) / (float)byte.MaxValue);
+            //currMaxSpeed = maxSpeed * ((float)(byte.MaxValue - currCell.GetCost()) / (float)byte.MaxValue);
+            currMaxSpeed = maxSpeed / currCell.GetCost();
             animator.speed = 1.0f;
 
             if (FlowFieldManager.Instance.getDestinationCell() != null)

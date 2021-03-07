@@ -1447,8 +1447,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useFile: 0
-  width: 400
-  height: 400
+  width: 50
+  height: 50
   cellSize: 1
   defaultFlowFieldDirection:
     x: 0

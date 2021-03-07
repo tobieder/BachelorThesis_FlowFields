@@ -51,10 +51,10 @@ public class AStarTest : MonoBehaviour
                                 //Debug.DrawLine(new Vector3(path[i].xPos, 0.0f, path[i].zPos) * 10f + Vector3.one * 5f, new Vector3(path[i + 1].xPos, 0.0f, path[i + 1].zPos) * 10f + Vector3.one * 5f, Color.green, 1000.0f);
                                 //Debug.DrawLine(new Vector3(path[i].xPos, 0.0f, path[i].zPos), new Vector3(path[i + 1].xPos, 0.0f, path[i + 1].zPos), Color.green, 10.0f);
 
-                                pathPositions[i] = new Vector3(path[i].xPos, 0.0f, path[i].zPos);
+                                pathPositions[i] = new Vector3(path[i].xPos, 0.01f, path[i].zPos);
                             }
 
-                            pathPositions[path.Count - 1] = new Vector3(path[path.Count - 1].xPos, 0.0f, path[path.Count - 1].zPos);
+                            pathPositions[path.Count - 1] = new Vector3(path[path.Count - 1].xPos, 0.01f, path[path.Count - 1].zPos);
 
                             GameObject pathGO = new GameObject("Unit" + npc.Key + "Path");
                             pathGO.transform.parent = this.transform;
