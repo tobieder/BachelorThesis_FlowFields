@@ -40,6 +40,14 @@ public class PathfindingBenchmark : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI mapSizeUI;
 
+
+    [SerializeField]
+    TMP_InputField flowFieldStartSizeInput;
+    [SerializeField]
+    TMP_InputField flowFieldStepSizeInput;
+    private int flowFieldStartSize;
+    private int flowFieldStepSize;
+
     AStarPathfinding astar;
     FlowField flowfield;
     Task pathfinding;
@@ -118,6 +126,8 @@ public class PathfindingBenchmark : MonoBehaviour
 
                     startButton.gameObject.SetActive(false);
                     inputField.gameObject.SetActive(false);
+                    flowFieldStartSizeInput.gameObject.SetActive(false);
+                    flowFieldStepSizeInput.gameObject.SetActive(false);
 
                     destination.transform.parent.gameObject.SetActive(false);
                     time.transform.parent.gameObject.SetActive(false);
@@ -137,6 +147,12 @@ public class PathfindingBenchmark : MonoBehaviour
                     inputField.gameObject.SetActive(true);
                     inputField.text = "";
                     inputField.placeholder.GetComponent<TextMeshProUGUI>().text = "Enter max. Grid-Size ...";
+                    flowFieldStartSizeInput.gameObject.SetActive(true);
+                    flowFieldStartSizeInput.text = "";
+                    flowFieldStartSizeInput.placeholder.GetComponent<TextMeshProUGUI>().text = "Enter map start size ...";
+                    flowFieldStepSizeInput.gameObject.SetActive(true);
+                    flowFieldStepSizeInput.text = "";
+                    flowFieldStepSizeInput.placeholder.GetComponent<TextMeshProUGUI>().text = "Enter step size ...";
 
                     destination.transform.parent.gameObject.SetActive(false);
                     time.transform.parent.gameObject.SetActive(true);
@@ -158,6 +174,8 @@ public class PathfindingBenchmark : MonoBehaviour
                     inputField.gameObject.SetActive(true);
                     inputField.text = "";
                     inputField.placeholder.GetComponent<TextMeshProUGUI>().text = "Enter max. X-Value ...";
+                    flowFieldStartSizeInput.gameObject.SetActive(false);
+                    flowFieldStepSizeInput.gameObject.SetActive(false);
 
                     destination.transform.parent.gameObject.SetActive(true);
                     //destination.transform.parent.GetComponent<RectTransform>().anchoredPosition = new Vector2(0.0f, -200.0f);
@@ -179,6 +197,8 @@ public class PathfindingBenchmark : MonoBehaviour
                     inputField.gameObject.SetActive(true);
                     inputField.text = "";
                     inputField.placeholder.GetComponent<TextMeshProUGUI>().text = "Enter max. Unit-Count ...";
+                    flowFieldStartSizeInput.gameObject.SetActive(false);
+                    flowFieldStepSizeInput.gameObject.SetActive(false);
 
                     destination.transform.parent.gameObject.SetActive(false);
                     time.transform.parent.gameObject.SetActive(true);
@@ -199,7 +219,22 @@ public class PathfindingBenchmark : MonoBehaviour
             switch (benchmarkType)
             {
                 case Benchmark.None: break;
-                case Benchmark.FlowFields: maxFlowFieldMapSize = int.Parse(inputField.text); break;
+                case Benchmark.FlowFields:
+                    {
+                        maxFlowFieldMapSize = int.Parse(inputField.text);
+                        if(flowFieldStartSizeInput.text == "" || flowFieldStepSizeInput.text == "")
+                        { 
+                            flowFieldStartSizeInput.placeholder.GetComponent<TextMeshProUGUI>().text = "<color=red>Enter a value!</color>";
+                            flowFieldStepSizeInput.placeholder.GetComponent<TextMeshProUGUI>().text = "<color=red>Enter a value!</color>";
+                            return;
+                        }
+                        flowFieldStartSize = int.Parse(flowFieldStartSizeInput.text);
+                        flowFieldStepSize = int.Parse(flowFieldStepSizeInput.text);
+
+                        mapSize = flowFieldStartSize;
+
+                        break;
+                    }
                 case Benchmark.AStarDistance: distanceAStarFinished = false; maxXValue = int.Parse(inputField.text); break;
                 case Benchmark.AStarUnits: maxUnits = int.Parse(inputField.text); break;
                 default: Debug.LogError("Unknown Benchmark Type."); break;
@@ -214,6 +249,8 @@ public class PathfindingBenchmark : MonoBehaviour
         dropdown.interactable = false;
         startButton.interactable = false;
         inputField.interactable = false;
+        flowFieldStartSizeInput.interactable = false;
+        flowFieldStepSizeInput.interactable = false;
         if (overwriteFile)
         {
             switch (benchmarkType)
@@ -250,6 +287,8 @@ public class PathfindingBenchmark : MonoBehaviour
         dropdown.interactable = true;
         startButton.interactable = true;
         inputField.interactable = true;
+        flowFieldStartSizeInput.interactable = true;
+        flowFieldStepSizeInput.interactable = true;
 
         benchmarkRunning = false;
     }
@@ -291,7 +330,7 @@ public class PathfindingBenchmark : MonoBehaviour
             time.text = averageExecutionTime.ToString("F4") + "s";
             mapSizeUI.text = mapSize + ", " + mapSize;
 
-            mapSize += 100;
+            mapSize += flowFieldStepSize;
         }
         else
         {
@@ -301,9 +340,9 @@ public class PathfindingBenchmark : MonoBehaviour
             aStarDistanceGraph.gameObject.SetActive(false);
             aStarUnitsGraph.gameObject.SetActive(false);
 
-            flowFieldGraph.ShowGraph(flowFieldValues, -1, (int _i) => "" + ((_i * 100) + 100), (float _f) => _f.ToString("F4") + "s");
+            flowFieldGraph.ShowGraph(flowFieldValues, -1, (int _i) => "" + ((_i * flowFieldStepSize) + flowFieldStartSize), (float _f) => _f.ToString("F4") + "s");
 
-            mapSize = 100;
+            mapSize = flowFieldStartSize;
             flowFieldValues.Clear();
         }
     }

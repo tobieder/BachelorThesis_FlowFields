@@ -20,6 +20,8 @@ public class FlowFieldManager : MonoBehaviour
 
     private List<byte> currentlyUsedFlowFields;
 
+    private bool dynamicAStarSwitch = false;
+
     private void Awake()
     {
         if (_instance != null && _instance != this)
@@ -58,16 +60,26 @@ public class FlowFieldManager : MonoBehaviour
                     if(!currentlyUsedFlowFields.Contains(indexToUse))
                     {
                         currentlyUsedFlowFields.Add(indexToUse);
-                        foreach(KeyValuePair<int, GameObject> npc in SelectedDictionary.selectedDictionary)
-                        {
-                            npc.Value.GetComponentInParent<NPC>().SetFlowMapIndex(indexToUse);
-                        }
                         break;
                     }
                 }
                 destinationCell = getClickedCell();
                 if (destinationCell != null)
                 {
+                    int indexCounter = 0;
+                    foreach (KeyValuePair<int, GameObject> npc in SelectedDictionary.selectedDictionary)
+                    {
+                        if (dynamicAStarSwitch)
+                        {
+                            npc.Value.GetComponentInParent<NPC>().SetPathfindingDynamic(indexToUse, destinationCell, indexCounter, SelectedDictionary.selectedDictionary.Count);
+                            indexCounter++;
+                        }
+                        else
+                        {
+                            npc.Value.GetComponentInParent<NPC>().SetPathfindingFlowField(indexToUse);
+                        }
+                    }
+
                     float startTime = Time.realtimeSinceStartup;
 
                     flowField.FlowFieldPathfinding(GridCreator.grid, indexToUse, destinationCell);
@@ -151,5 +163,10 @@ public class FlowFieldManager : MonoBehaviour
     public List<byte> GetCurrentlyUsedFlowFields()
     {
         return currentlyUsedFlowFields;
+    }
+
+    public void SetDynamicAStarSwitch(bool _value)
+    {
+        dynamicAStarSwitch = _value;
     }
 }

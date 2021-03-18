@@ -38,8 +38,13 @@ public class SpawnNPC : MonoBehaviour
             }
             else
             {
-                Instantiate(npc, hit.point, Quaternion.Euler(1.0f, 0.0f, 0.0f), parent);
+                CreateNPCAtPos(hit.point);
             }
         }
+    }
+
+    void CreateNPCAtPos(Vector3 _pos)
+    {
+        Instantiate(npc, _pos, Quaternion.Euler(1.0f, 0.0f, 0.0f), parent);
     }
 }

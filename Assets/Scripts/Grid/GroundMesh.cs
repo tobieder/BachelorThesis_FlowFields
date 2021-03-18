@@ -85,7 +85,7 @@ public class GroundMesh : MonoBehaviour
         {
             for (int z = 0; z < grid.GetHeight(); z++)
             {
-                Cell currCell = GridCreator.grid.getCell(x, z);
+                Cell currCell = GridCreator.grid.getCell(z, x);
                 float perlin = Mathf.PerlinNoise((float)x / (float)GridCreator.grid.GetWidth() * scale, (float)z / (float)GridCreator.grid.GetHeight() * scale);
                 if (perlin < 0.4f)
                 {

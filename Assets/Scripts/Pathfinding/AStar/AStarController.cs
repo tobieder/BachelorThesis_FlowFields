@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AStarTest : MonoBehaviour
+public class AStarController : MonoBehaviour
 {
     public Material pathMaterial;
 
@@ -16,7 +16,7 @@ public class AStarTest : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(1))
         {
             if(SelectedDictionary.selectedDictionary.Count == 0)
             {
@@ -33,7 +33,6 @@ public class AStarTest : MonoBehaviour
                     }
                     pathGOs = new List<GameObject>();
 
-                    float averagePathLength = 0.0f;
                     foreach (KeyValuePair<int, GameObject> npc in SelectedDictionary.selectedDictionary)
                     {
                         //npc.Value.GetComponentInParent<NPC>().SetFlowMapIndex(indexToUse);
@@ -42,7 +41,9 @@ public class AStarTest : MonoBehaviour
 
                         if (path != null)
                         {
-                            averagePathLength += path.Count;
+                            npc.Value.GetComponentInParent<NPC>().SetPathfindingAStar(path);
+
+                            // ----- Display Path ------
 
                             Vector3[] pathPositions = new Vector3[path.Count];
 
@@ -67,6 +68,7 @@ public class AStarTest : MonoBehaviour
                             pathRenderer.endWidth = 0.2f;
                             pathRenderer.positionCount = pathPositions.Length;
                             pathRenderer.SetPositions(pathPositions);
+                            // ------------------------
                         }
                     }
                 }

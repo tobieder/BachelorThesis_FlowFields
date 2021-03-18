@@ -25,4 +25,9 @@ public class NPCManager : MonoBehaviour
     {
         npcs = new List<NPC>();
     }
+
+    public void ApplyPhysics(bool _val)
+    {
+        Physics.IgnoreLayerCollision(12, 12, !_val);
+    }
 }
