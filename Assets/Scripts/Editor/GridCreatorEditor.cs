@@ -10,19 +10,10 @@ public class GridCreatorEditor : Editor
     {
         GridCreator gridCreator = (GridCreator)target;
 
-        gridCreator.useFile = GUILayout.Toggle(gridCreator.useFile, "Use File");
-
-        if(!gridCreator.useFile)
-        {
-            gridCreator.defaultFlowFieldDirection = EditorGUILayout.Vector3Field("Default Flow Field Direction", gridCreator.defaultFlowFieldDirection);
-        }
-
         EditorGUILayout.Space(10);
 
-        gridCreator.width = EditorGUILayout.IntField("Width", gridCreator.width);
-        gridCreator.height = EditorGUILayout.IntField("Height", gridCreator.height);
-        gridCreator.cellSize = EditorGUILayout.FloatField("Cell Size", gridCreator.cellSize);
-
-
+        gridCreator.m_Width = EditorGUILayout.IntField("Width", gridCreator.m_Width);
+        gridCreator.m_Height = EditorGUILayout.IntField("Height", gridCreator.m_Height);
+        gridCreator.m_CellSize = EditorGUILayout.FloatField("Cell Size", gridCreator.m_CellSize);
     }
 }

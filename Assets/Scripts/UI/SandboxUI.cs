@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class SandboxUI : MonoBehaviour
 {
-    public GameObject gameOverlay;
-    public GameObject pauseMenu;
+    [SerializeField]
+    private GameObject m_GameOverlay;
+    [SerializeField]
+    private GameObject m_PauseMenu;
 
     // Update is called once per frame
     void Update()
@@ -18,12 +20,12 @@ public class SandboxUI : MonoBehaviour
 
     public void PauseGame()
     {
-        gameOverlay.SetActive(false);
-        pauseMenu.GetComponent<PauseMenu>().PauseGame();
+        m_GameOverlay.SetActive(false);
+        m_PauseMenu.GetComponent<PauseMenu>().PauseGame();
     }
 
     public void ResumeGame()
     {
-        gameOverlay.SetActive(true);
+        m_GameOverlay.SetActive(true);
     }
 }

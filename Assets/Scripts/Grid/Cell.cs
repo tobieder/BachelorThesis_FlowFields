@@ -13,83 +13,83 @@ public enum GroundType
 public class Cell
 {
     // General
-    Grid grid;
+    Grid m_Grid;
 
-    public float xPos;
-    public float zPos;
+    public float m_XPos;
+    public float m_ZPos;
 
-    public int xIndex;
-    public int zIndex;
+    public int m_XIndex;
+    public int m_ZIndex;
 
     private List<Cell> m_Neighbors;
 
     // Ground
-    private GroundType groundType;
-    private int[] uvs;
+    private GroundType m_GroundType;
+    private int[] m_UVs;
 
     // Flow Field
-    private byte cost; // 1 - 254 (255 == wall/unwakable) (0 == goal)++
-    private byte originalCost;
-    private ushort integration;
-    private Vector3[] flowFieldDirections;
+    private byte m_Cost; // 1 - 254 (255 == wall/unwakable)
+    private byte m_OriginalCost;
+    private ushort m_Integration;
+    private Vector3[] m_FlowFieldDirections;
 
     // A*
-    private int gCost;
-    private int hCost;
-    private int fCost;
+    private int m_GCost;
+    private int m_HCost;
+    private int m_FCost;
 
-    private Cell prevCell;
+    private Cell m_PrevCell;
 
     public Cell(Grid _grid, float _xPos, float _zPos, int _xIndex, int _zIndex, byte _cost)
     {
         // General
-        grid = _grid;
+        m_Grid = _grid;
 
-        xPos = _xPos;
-        zPos = _zPos;
-        xIndex = _xIndex;
-        zIndex = _zIndex;
+        m_XPos = _xPos;
+        m_ZPos = _zPos;
+        m_XIndex = _xIndex;
+        m_ZIndex = _zIndex;
 
-        uvs = new int[4];
+        m_UVs = new int[4];
 
-        // FLowField
-        cost = _cost;
-        originalCost = cost;
+        // FlowField
+        m_Cost = _cost;
+        m_OriginalCost = m_Cost;
 
-        integration = ushort.MaxValue;
+        m_Integration = ushort.MaxValue;
 
-        flowFieldDirections = new Vector3[byte.MaxValue + 1];
+        m_FlowFieldDirections = new Vector3[byte.MaxValue + 1];
 
         // A*
-        gCost = int.MaxValue;
-        prevCell = null;
+        m_GCost = int.MaxValue;
+        m_PrevCell = null;
     }
 
     #region General
 
     public override string ToString()
     {
-        return xPos + ", " + zPos;
+        return m_XPos + ", " + m_ZPos;
     }
 
     public void SetGroundType(GroundType _groundType)
     {
-        groundType = _groundType;
+        m_GroundType = _groundType;
     }
 
     public GroundType GetGroundType()
     {
-        return groundType;
+        return m_GroundType;
     }
 
     public void SetUVs(int[] _uvs)
     {
-        uvs = _uvs;
+        m_UVs = _uvs;
     }
 
     public int[] GetUVs()
     {
-        return uvs;
+        return m_UVs;
     }
 
     public List<Cell> GetNeighbors()
@@ -102,40 +102,40 @@ public class Cell
     {
         List<Cell> neighbors = new List<Cell>();
 
-        if (this.xIndex - 1 >= 0)
+        if (this.m_XIndex - 1 >= 0)
         {
-            neighbors.Add(grid.getCell(this.xIndex - 1, this.zIndex));
+            neighbors.Add(m_Grid.getCell(this.m_XIndex - 1, this.m_ZIndex));
 
-            if (this.zIndex - 1 >= 0)
+            if (this.m_ZIndex - 1 >= 0)
             {
-                neighbors.Add(grid.getCell(this.xIndex - 1, this.zIndex - 1));
+                neighbors.Add(m_Grid.getCell(this.m_XIndex - 1, this.m_ZIndex - 1));
             }
-            if (this.zIndex + 1 < grid.GetHeight())
+            if (this.m_ZIndex + 1 < m_Grid.GetHeight())
             {
-                neighbors.Add(grid.getCell(this.xIndex - 1, this.zIndex + 1));
+                neighbors.Add(m_Grid.getCell(this.m_XIndex - 1, this.m_ZIndex + 1));
             }
         }
-        if (this.xIndex + 1 < grid.GetWidth())
+        if (this.m_XIndex + 1 < m_Grid.GetWidth())
         {
-            neighbors.Add(grid.getCell(this.xIndex + 1, this.zIndex));
+            neighbors.Add(m_Grid.getCell(this.m_XIndex + 1, this.m_ZIndex));
 
-            if (this.zIndex - 1 >= 0)
+            if (this.m_ZIndex - 1 >= 0)
             {
-                neighbors.Add(grid.getCell(this.xIndex + 1, this.zIndex - 1));
+                neighbors.Add(m_Grid.getCell(this.m_XIndex + 1, this.m_ZIndex - 1));
             }
-            if (this.zIndex + 1 < grid.GetHeight())
+            if (this.m_ZIndex + 1 < m_Grid.GetHeight())
             {
-                neighbors.Add(grid.getCell(this.xIndex + 1, this.zIndex + 1));
+                neighbors.Add(m_Grid.getCell(this.m_XIndex + 1, this.m_ZIndex + 1));
             }
         }
 
-        if (this.zIndex - 1 >= 0)
+        if (this.m_ZIndex - 1 >= 0)
         {
-            neighbors.Add(grid.getCell(this.xIndex, this.zIndex - 1));
+            neighbors.Add(m_Grid.getCell(this.m_XIndex, this.m_ZIndex - 1));
         }
-        if (this.zIndex + 1 < grid.GetHeight())
+        if (this.m_ZIndex + 1 < m_Grid.GetHeight())
         {
-            neighbors.Add(grid.getCell(this.xIndex, this.zIndex + 1));
+            neighbors.Add(m_Grid.getCell(this.m_XIndex, this.m_ZIndex + 1));
         }
 
         m_Neighbors = neighbors;
@@ -145,40 +145,40 @@ public class Cell
     {
         List<Cell> neighbors = new List<Cell>();
 
-        if (this.xIndex - 1 >= 0)
+        if (this.m_XIndex - 1 >= 0)
         {
-            neighbors.Add(grid.getCell(this.xIndex - 1, this.zIndex));
+            neighbors.Add(m_Grid.getCell(this.m_XIndex - 1, this.m_ZIndex));
 
-            if (this.zIndex - 1 >= 0)
+            if (this.m_ZIndex - 1 >= 0)
             {
-                neighbors.Add(grid.getCell(this.xIndex - 1, this.zIndex - 1));
+                neighbors.Add(m_Grid.getCell(this.m_XIndex - 1, this.m_ZIndex - 1));
             }
-            if (this.zIndex + 1 < grid.GetHeight())
+            if (this.m_ZIndex + 1 < m_Grid.GetHeight())
             {
-                neighbors.Add(grid.getCell(this.xIndex - 1, this.zIndex + 1));
+                neighbors.Add(m_Grid.getCell(this.m_XIndex - 1, this.m_ZIndex + 1));
             }
         }
-        if (this.xIndex + 1 < grid.GetWidth())
+        if (this.m_XIndex + 1 < m_Grid.GetWidth())
         {
-            neighbors.Add(grid.getCell(this.xIndex + 1, this.zIndex));
+            neighbors.Add(m_Grid.getCell(this.m_XIndex + 1, this.m_ZIndex));
 
-            if (this.zIndex - 1 >= 0)
+            if (this.m_ZIndex - 1 >= 0)
             {
-                neighbors.Add(grid.getCell(this.xIndex + 1, this.zIndex - 1));
+                neighbors.Add(m_Grid.getCell(this.m_XIndex + 1, this.m_ZIndex - 1));
             }
-            if (this.zIndex + 1 < grid.GetHeight())
+            if (this.m_ZIndex + 1 < m_Grid.GetHeight())
             {
-                neighbors.Add(grid.getCell(this.xIndex + 1, this.zIndex + 1));
+                neighbors.Add(m_Grid.getCell(this.m_XIndex + 1, this.m_ZIndex + 1));
             }
         }
 
-        if (this.zIndex - 1 >= 0)
+        if (this.m_ZIndex - 1 >= 0)
         {
-            neighbors.Add(grid.getCell(this.xIndex, this.zIndex - 1));
+            neighbors.Add(m_Grid.getCell(this.m_XIndex, this.m_ZIndex - 1));
         }
-        if (this.zIndex + 1 < grid.GetHeight())
+        if (this.m_ZIndex + 1 < m_Grid.GetHeight())
         {
-            neighbors.Add(grid.getCell(this.xIndex, this.zIndex + 1));
+            neighbors.Add(m_Grid.getCell(this.m_XIndex, this.m_ZIndex + 1));
         }
 
         m_Neighbors = neighbors;
@@ -190,42 +190,42 @@ public class Cell
     #region FlowFields
     public void SetCost(byte _newCost)
     {
-        cost = _newCost;
+        m_Cost = _newCost;
     }
 
     public byte GetCost()
     {
-        return cost;
+        return m_Cost;
     }
 
     public void SetOriginalCost(byte _newOriginalCost)
     {
-        originalCost = _newOriginalCost;
+        m_OriginalCost = _newOriginalCost;
     }
 
     public byte GetOriginalCost()
     {
-        return originalCost;
+        return m_OriginalCost;
     }
 
     public void SetIntegration(ushort _newIntegration)
     {
-        integration = _newIntegration;
+        m_Integration = _newIntegration;
     }
 
     public ushort GetIntegration()
     {
-        return integration;
+        return m_Integration;
     }
 
     public void SetFlowFieldDirection(byte _index, Vector3 _newFlowFieldDirection)
     {
-        flowFieldDirections[_index] = _newFlowFieldDirection;
+        m_FlowFieldDirections[_index] = _newFlowFieldDirection;
     }
 
     public Vector3 GetFlowFieldDirection(byte _index)
     {
-        return flowFieldDirections[_index];
+        return m_FlowFieldDirections[_index];
     }
 
     #endregion
@@ -234,45 +234,45 @@ public class Cell
 
     public void CalculateFCost()
     {
-        fCost = gCost + hCost;
+        m_FCost = m_GCost + m_HCost;
     }
 
     public void SetGCost(int newGCost)
     {
-        gCost = newGCost;
+        m_GCost = newGCost;
     }
     
     public int GetGCost()
     {
-        return gCost;
+        return m_GCost;
     }
     public void SetHCost(int newHCost)
     {
-        hCost = newHCost;
+        m_HCost = newHCost;
     }
 
     public int GetHCost()
     {
-        return hCost;
+        return m_HCost;
     }
     public void SetFCost(int newFCost)
     {
-        fCost = newFCost;
+        m_FCost = newFCost;
     }
 
     public int GetFCost()
     {
-        return fCost;
+        return m_FCost;
     }
 
     public void SetPrevCell(Cell newPrevCell)
     {
-        prevCell = newPrevCell;
+        m_PrevCell = newPrevCell;
     }
 
     public Cell GetPrevCell()
     {
-        return prevCell;
+        return m_PrevCell;
     }
 
     #endregion

@@ -14,16 +14,27 @@ public enum PathfindingMethod { FlowField, AStar, None}
 public class NPC : MonoBehaviour
 {
     [SerializeField]
-    private float maxSpeed;
-    private float currMaxSpeed;
+    private float m_MaxSpeed;
+    private float m_CurrMaxSpeed;
 
     [SerializeField]
     private PathfindingMethod m_PathfingingMethod; 
 
-    Rigidbody rb;
+    Rigidbody m_Rigidbody;
 
     // ANIMATOR
-    private Animator animator;
+    private Animator m_Animator;
+
+    // FLOWFIELD
+    private byte m_FlowmapIndex;
+
+    public float m_TargetRadius;
+    public float m_ArriveRadius;
+
+    // ASTAR
+    private float m_AStarTargetRadius = 0.5f;
+    private float m_ChangeToAStarRadius = 5.0f;
+    List<Cell> m_Path = new List<Cell>();
 
     // DYNAMIC
     private bool m_DynamicPathfindingSwitch = false;
@@ -31,125 +42,115 @@ public class NPC : MonoBehaviour
     private int m_GroupIndex;
     private int m_GroupUnits;
 
-    // FLOWFIELD
-    private byte flowmapIndex;
-
-    public float targetRadius;
-    public float arriveRadius;
-
-    // ASTAR
-    private float m_AStarTargetRadius = 0.5f;
-    private float m_ChangeToAStarRadius = 5.0f;
-    List<Cell> m_Path = new List<Cell>();
-
 
     private void Start()
     {
-        NPCManager.Instance.npcs.Add(this);
+        NPCManager.Instance.m_NPCs.Add(this);
 
-        currMaxSpeed = maxSpeed;
+        m_CurrMaxSpeed = m_MaxSpeed;
 
-        flowmapIndex = byte.MaxValue;
+        // Set to the default Flowmap Layer with no movement.
+        m_FlowmapIndex = byte.MaxValue;
 
-        rb = GetComponent<Rigidbody>();
-        this.transform.rotation = Quaternion.Euler(0.0f, 1.0f, 0.0f);
+        m_Rigidbody = GetComponent<Rigidbody>();
+        //this.transform.rotation = Quaternion.Euler(0.0f, 1.0f, 0.0f);
 
-        animator = GetComponent<Animator>(); 
+        m_Animator = GetComponent<Animator>(); 
         
         this.transform.rotation = Quaternion.LookRotation(new Vector3(Random.Range(-1, 1), 0.0f, Random.Range(-1, 1)), Vector3.up);
     }
 
     private void OnDestroy()
     {
-        _ = NPCManager.Instance.npcs.Remove(this);
+        _ = NPCManager.Instance.m_NPCs.Remove(this);
     }
 
     private void FixedUpdate()
     {
-        animator.speed = 1.0f;
+        m_Animator.speed = 1.0f;
+
+        Cell currCell = GridCreator.s_Grid.getCellFromPosition(transform.position.x, transform.position.z);
+
+        /* Using the current setup the correct currMaxSpeed value would be (maxSpeed / currCell.GetCost())
+         * this is way to slow. To compensate it is possible to adjust the speed here.
+        */
+        m_CurrMaxSpeed = m_MaxSpeed * ((float)(byte.MaxValue - (currCell.GetCost() * 10)) / (float)byte.MaxValue);
+
         if (m_PathfingingMethod == PathfindingMethod.FlowField)
         {
-            if (flowmapIndex == byte.MaxValue)
+            if (m_FlowmapIndex == byte.MaxValue)
             {
                 return;
             }
             else
             {
-                Cell currCell = GridCreator.grid.getCellFromPosition(transform.position.x, transform.position.z);
-                //currMaxSpeed = maxSpeed * ((float)(byte.MaxValue - currCell.GetCost()) / (float)byte.MaxValue);
-                currMaxSpeed = maxSpeed / currCell.GetCost();
-
                 if (FlowFieldManager.Instance.getDestinationCell() != null)
                 {
-                    float dstToDestination = (new Vector3(FlowFieldManager.Instance.getDestinationCell().xPos, 0.0f, FlowFieldManager.Instance.getDestinationCell().zIndex) - transform.position).magnitude;
+                    float dstToDestination = (new Vector3(FlowFieldManager.Instance.getDestinationCell().m_XPos, 0.0f, FlowFieldManager.Instance.getDestinationCell().m_ZPos) - transform.position).magnitude;
 
                     if(m_DynamicPathfindingSwitch && dstToDestination < m_ChangeToAStarRadius)
                     {
                         AStarPathfinding pathfinding = new AStarPathfinding();
                         //Vector3 targetpos = new Vector3(FlowFieldManager.Instance.getDestinationCell().xPos, 0.0f, FlowFieldManager.Instance.getDestinationCell().zIndex);
 
-                        List<Cell> path = pathfinding.FindPath(GridCreator.grid, GridCreator.grid.getCellFromPosition(transform.position.x, transform.position.z), m_Destination);
+                        List<Cell> path = pathfinding.FindPath(GridCreator.s_Grid, GridCreator.s_Grid.getCellFromPosition(transform.position.x, transform.position.z), m_Destination);
 
                         SetPathfindingAStar(path);
                         return;
                     }
 
-                    if (dstToDestination <= targetRadius)
+                    if (dstToDestination <= m_TargetRadius)
                     {
-                        rb.velocity = Vector3.zero;
+                        m_Rigidbody.velocity = Vector3.zero;
                     }
-                    else if (dstToDestination > targetRadius && dstToDestination < arriveRadius)
+                    else if (dstToDestination > m_TargetRadius && dstToDestination < m_ArriveRadius)
                     {
-                        Vector3 velocity = currCell.GetFlowFieldDirection(flowmapIndex);
-                        rb.AddForce(velocity);
+                        Vector3 velocity = currCell.GetFlowFieldDirection(m_FlowmapIndex);
+                        m_Rigidbody.AddForce(velocity);
 
-                        currMaxSpeed *= ((dstToDestination - targetRadius) / (arriveRadius - targetRadius));
-                        animator.speed = ((dstToDestination - targetRadius) / (arriveRadius - targetRadius));
+                        m_CurrMaxSpeed *= ((dstToDestination - m_TargetRadius) / (m_ArriveRadius - m_TargetRadius));
+                        m_Animator.speed = ((dstToDestination - m_TargetRadius) / (m_ArriveRadius - m_TargetRadius));
 
-                        if (rb.velocity.magnitude > currMaxSpeed)
+                        if (m_Rigidbody.velocity.magnitude > m_CurrMaxSpeed)
                         {
-                            rb.velocity = rb.velocity.normalized * currMaxSpeed;
+                            m_Rigidbody.velocity = m_Rigidbody.velocity.normalized * m_CurrMaxSpeed;
                         }
                     }
                     else
                     {
-                        Vector3 velocity = currCell.GetFlowFieldDirection(flowmapIndex);
+                        Vector3 velocity = currCell.GetFlowFieldDirection(m_FlowmapIndex);
 
-                        rb.AddForce(velocity);
+                        m_Rigidbody.AddForce(velocity);
 
-                        if (rb.velocity.magnitude > currMaxSpeed)
+                        if (m_Rigidbody.velocity.magnitude > m_CurrMaxSpeed)
                         {
-                            rb.velocity = rb.velocity.normalized * currMaxSpeed;
+                            m_Rigidbody.velocity = m_Rigidbody.velocity.normalized * m_CurrMaxSpeed;
                         }
                     }
 
 
-                    if (rb.velocity != Vector3.zero)
+                    if (m_Rigidbody.velocity != Vector3.zero)
                     {
-                        this.transform.rotation = Quaternion.LookRotation(rb.velocity, Vector3.up);
+                        this.transform.rotation = Quaternion.LookRotation(m_Rigidbody.velocity, Vector3.up);
                     }
                 }
             }
         }
         else if(m_PathfingingMethod == PathfindingMethod.AStar)
         {
-            Cell currCell = GridCreator.grid.getCellFromPosition(transform.position.x, transform.position.z);
-            currMaxSpeed = maxSpeed * ((float)(byte.MaxValue - (currCell.GetCost() * 10)) / (float)byte.MaxValue);
-            //currMaxSpeed = maxSpeed / currCell.GetCost();
-
-            Vector3 velocity = (new Vector3(m_Path[0].xPos, 0.0f, m_Path[0].zPos) - transform.position);
+            Vector3 velocity = (new Vector3(m_Path[0].m_XPos, 0.0f, m_Path[0].m_ZPos) - transform.position);
             float dstToDestination = velocity.magnitude;
 
-            rb.AddForce(velocity.normalized);
+            m_Rigidbody.AddForce(velocity.normalized);
 
-            if (rb.velocity.magnitude > currMaxSpeed)
+            if (m_Rigidbody.velocity.magnitude > m_CurrMaxSpeed)
             {
-                rb.velocity = rb.velocity.normalized * currMaxSpeed;
+                m_Rigidbody.velocity = m_Rigidbody.velocity.normalized * m_CurrMaxSpeed;
             }
 
-            if (rb.velocity != Vector3.zero)
+            if (m_Rigidbody.velocity != Vector3.zero)
             {
-                this.transform.rotation = Quaternion.LookRotation(rb.velocity, Vector3.up);
+                this.transform.rotation = Quaternion.LookRotation(m_Rigidbody.velocity, Vector3.up);
             }
 
             if (dstToDestination < m_AStarTargetRadius)
@@ -157,7 +158,7 @@ public class NPC : MonoBehaviour
                 m_Path.RemoveAt(0);
                 if (m_Path.Count == 0)
                 {
-                    rb.velocity = Vector3.zero;
+                    m_Rigidbody.velocity = Vector3.zero;
                     m_PathfingingMethod = PathfindingMethod.None;
                     return;
                 }
@@ -165,20 +166,21 @@ public class NPC : MonoBehaviour
         }
         else
         {
-            // Wait for new path
+            // No Path to follow currently
         }
 
-        if (rb.velocity.magnitude > 0.2f && animator != null)
+        if (m_Rigidbody.velocity.magnitude > 0.2f && m_Animator != null)
         {
-            animator.SetBool("isWalking", true);
+            m_Animator.SetBool("isWalking", true);
         }
         else
         {
-            animator.SetBool("isWalking", false);
+            m_Animator.SetBool("isWalking", false);
         }
     }
     
 #if UNITY_EDITOR
+    // Debugging Tool to show certain NPC information in the editor.
     private void OnDrawGizmos()
     {
         GUIStyle style = new GUIStyle(GUI.skin.label);
@@ -195,12 +197,12 @@ public class NPC : MonoBehaviour
         m_Path.Clear();
         m_PathfingingMethod = PathfindingMethod.FlowField;
         m_DynamicPathfindingSwitch = false;
-        flowmapIndex = _index;
+        m_FlowmapIndex = _index;
     }
 
     public void SetPathfindingAStar(List<Cell> _path)
     {
-        flowmapIndex = byte.MaxValue;
+        m_FlowmapIndex = byte.MaxValue;
         m_PathfingingMethod = PathfindingMethod.AStar;
         m_DynamicPathfindingSwitch = false;
         m_Path = _path;
@@ -208,10 +210,10 @@ public class NPC : MonoBehaviour
 
     public void SetPathfindingDynamic(byte _index, Cell _target, int _groupIndex, int _groupUnits)
     {
-        flowmapIndex = byte.MaxValue;
+        m_FlowmapIndex = byte.MaxValue;
         m_PathfingingMethod = PathfindingMethod.FlowField;
         m_DynamicPathfindingSwitch = true;
-        flowmapIndex = _index;
+        m_FlowmapIndex = _index;
 
         m_GroupIndex = _groupIndex;
         m_GroupUnits = _groupUnits;
@@ -221,11 +223,11 @@ public class NPC : MonoBehaviour
 
     private Cell GetDestinationFormationCell(Cell _destination, int _groupIndex, int _groupUnits)
     {
-        return GridCreator.grid.getCell(_destination.xIndex + _groupIndex, _destination.zIndex);
+        return GridCreator.s_Grid.getCell(_destination.m_XIndex + _groupIndex, _destination.m_ZIndex);
     }
 
     public byte GetFlowMapIndex()
     {
-        return flowmapIndex;
+        return m_FlowmapIndex;
     }
 }

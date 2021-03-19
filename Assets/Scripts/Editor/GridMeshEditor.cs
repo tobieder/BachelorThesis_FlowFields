@@ -11,7 +11,7 @@ public class GridMeshEditor : Editor
 
         if(GUILayout.Button("Update Mesh"))
         {
-            gridMesh.MeshUpdateEditor();
+            gridMesh.MeshUpdate();
         }
 
         EditorGUILayout.Separator();

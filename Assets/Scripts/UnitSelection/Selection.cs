@@ -4,31 +4,31 @@ using UnityEngine;
 
 public class Selection : MonoBehaviour
 {
-    public LayerMask selectableLayer;
-    public LayerMask groundLayer;
+    public LayerMask m_SelectableLayer;
+    public LayerMask m_GroundLayer;
 
-    public Color rectColor;
-    public Color rectBorderColor;
+    public Color m_RectColor;
+    public Color m_RectBorderColor;
 
-    private SelectedDictionary selectedDictionary;
+    private SelectedDictionary m_SelectedDictionary;
 
-    private RaycastHit hit;
-    private bool dragSelect;
+    private RaycastHit m_Hit;
+    private bool m_DragSelect;
 
-    private MeshCollider selectionBox;
-    private Mesh selectionMesh;
+    private MeshCollider m_SelectionBox;
+    private Mesh m_SelectionMesh;
 
-    private Vector2[] corners;
-    private Vector3[] vertices;
-    private Vector3[] vecs;
+    private Vector2[] m_Corners;
+    private Vector3[] m_Vertices;
+    private Vector3[] m_Vecs;
 
-    private Vector3 dragStartPosition;
-    private Vector3 dragEndPosition;
+    private Vector3 m_DragStartPosition;
+    private Vector3 m_DragEndPosition;
 
     void Start()
     {
-        selectedDictionary = GetComponent<SelectedDictionary>();
-        dragSelect = false;
+        m_SelectedDictionary = GetComponent<SelectedDictionary>();
+        m_DragSelect = false;
     }
 
     void Update()
@@ -40,91 +40,91 @@ public class Selection : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            dragStartPosition = Input.mousePosition;
+            m_DragStartPosition = Input.mousePosition;
         }
 
         if (Input.GetMouseButton(0))
         {
-            if ((dragStartPosition - Input.mousePosition).magnitude > 40.0f)
+            if ((m_DragStartPosition - Input.mousePosition).magnitude > 40.0f)
             {
-                dragSelect = true;
+                m_DragSelect = true;
             }
         }
 
 
         if (Input.GetMouseButtonUp(0))
         {
-            if (!dragSelect)
+            if (!m_DragSelect)
             {
-                Ray ray = Camera.main.ScreenPointToRay(dragStartPosition);
+                Ray ray = Camera.main.ScreenPointToRay(m_DragStartPosition);
 
-                if (Physics.Raycast(ray, out hit, 50000.0f, selectableLayer))
+                if (Physics.Raycast(ray, out m_Hit, 50000.0f, m_SelectableLayer))
                 {
                     if (Input.GetKey(KeyCode.LeftShift))
                     {
-                        selectedDictionary.AddSelected(hit.transform.gameObject);
+                        m_SelectedDictionary.AddSelected(m_Hit.transform.gameObject);
                     }
                     else
                     {
-                        selectedDictionary.DeselectAll();
-                        selectedDictionary.AddSelected(hit.transform.gameObject);
+                        m_SelectedDictionary.DeselectAll();
+                        m_SelectedDictionary.AddSelected(m_Hit.transform.gameObject);
                     }
                 }
                 else
                 {
                     if (!Input.GetKey(KeyCode.LeftShift))
                     {
-                        selectedDictionary.DeselectAll();
+                        m_SelectedDictionary.DeselectAll();
                     }
                 }
             }
             else
             {
-                vertices = new Vector3[4];
-                vecs = new Vector3[4];
+                m_Vertices = new Vector3[4];
+                m_Vecs = new Vector3[4];
                 int i = 0;
-                dragEndPosition = Input.mousePosition;
-                corners = getBoundingBox(dragStartPosition, dragEndPosition);
+                m_DragEndPosition = Input.mousePosition;
+                m_Corners = getBoundingBox(m_DragStartPosition, m_DragEndPosition);
 
-                foreach (Vector2 corner in corners)
+                foreach (Vector2 corner in m_Corners)
                 {
                     Ray ray = Camera.main.ScreenPointToRay(corner);
 
-                    if (Physics.Raycast(ray, out hit, 50000.0f, groundLayer))
+                    if (Physics.Raycast(ray, out m_Hit, 50000.0f, m_GroundLayer))
                     {
-                        vertices[i] = new Vector3(hit.point.x, hit.point.y, hit.point.z);
-                        vecs[i] = ray.origin - hit.point;
-                        Debug.DrawLine(Camera.main.ScreenToWorldPoint(corner), hit.point, Color.red, 10.0f);
+                        m_Vertices[i] = new Vector3(m_Hit.point.x, m_Hit.point.y, m_Hit.point.z);
+                        m_Vecs[i] = ray.origin - m_Hit.point;
+                        Debug.DrawLine(Camera.main.ScreenToWorldPoint(corner), m_Hit.point, Color.red, 10.0f);
                     }
                     i++;
                 }
 
-                selectionMesh = GenerateSelectionMesh(vertices, vecs);
+                m_SelectionMesh = GenerateSelectionMesh(m_Vertices, m_Vecs);
 
-                selectionBox = gameObject.AddComponent<MeshCollider>();
-                selectionBox.sharedMesh = selectionMesh;
-                selectionBox.convex = true;
-                selectionBox.isTrigger = true;
+                m_SelectionBox = gameObject.AddComponent<MeshCollider>();
+                m_SelectionBox.sharedMesh = m_SelectionMesh;
+                m_SelectionBox.convex = true;
+                m_SelectionBox.isTrigger = true;
 
                 if (!Input.GetKey(KeyCode.LeftShift))
                 {
-                    selectedDictionary.DeselectAll();
+                    m_SelectedDictionary.DeselectAll();
                 }
 
-                Destroy(selectionBox, 0.02f);
+                Destroy(m_SelectionBox, 0.02f);
             }
 
-            dragSelect = false;
+            m_DragSelect = false;
         }
     }
 
     private void OnGUI()
     {
-        if(dragSelect)
+        if(m_DragSelect)
         {
-            var rect = Utils.GetScreenRect(dragStartPosition, Input.mousePosition);
-            Utils.DrawScreenRect(rect, rectColor);
-            Utils.DrawScreenRectBorder(rect, 2, rectBorderColor);
+            var rect = Utils.GetScreenRect(m_DragStartPosition, Input.mousePosition);
+            Utils.DrawScreenRect(rect, m_RectColor);
+            Utils.DrawScreenRectBorder(rect, 2, m_RectBorderColor);
         }
     }
 
@@ -195,6 +195,6 @@ public class Selection : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        selectedDictionary.AddSelected(other.gameObject);
+        m_SelectedDictionary.AddSelected(other.gameObject);
     }
 }

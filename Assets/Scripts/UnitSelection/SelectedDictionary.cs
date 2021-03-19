@@ -4,33 +4,33 @@ using UnityEngine;
 
 public class SelectedDictionary : MonoBehaviour
 {
-    public static Dictionary<int, GameObject> selectedDictionary = new Dictionary<int, GameObject>();
+    public static Dictionary<int, GameObject> s_SelectedDictionary = new Dictionary<int, GameObject>();
 
     public void AddSelected(GameObject _selected)
     {
         int id = _selected.GetInstanceID();
 
-        if (!(selectedDictionary.ContainsKey(id)))
+        if (!(s_SelectedDictionary.ContainsKey(id)))
         {
-            selectedDictionary.Add(id, _selected);
+            s_SelectedDictionary.Add(id, _selected);
             _selected.AddComponent<SelectionComponent>();
         }
     }
 
     public void Deselect(int _id)
     {
-        Destroy(selectedDictionary[_id].GetComponent<SelectionComponent>());
-        selectedDictionary.Remove(_id);
+        Destroy(s_SelectedDictionary[_id].GetComponent<SelectionComponent>());
+        s_SelectedDictionary.Remove(_id);
     }
     public void DeselectAll()
     {
-        foreach(KeyValuePair<int, GameObject> kvPair in selectedDictionary)
+        foreach(KeyValuePair<int, GameObject> kvPair in s_SelectedDictionary)
         {
             if(kvPair.Value != null)
             {
-                Destroy(selectedDictionary[kvPair.Key].GetComponent<SelectionComponent>());
+                Destroy(s_SelectedDictionary[kvPair.Key].GetComponent<SelectionComponent>());
             }
         }
-        selectedDictionary.Clear();
+        s_SelectedDictionary.Clear();
     }
 }

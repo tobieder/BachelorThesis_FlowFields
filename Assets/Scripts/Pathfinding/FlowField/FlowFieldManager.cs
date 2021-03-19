@@ -10,17 +10,17 @@ public class FlowFieldManager : MonoBehaviour
     // ---------
 
     [SerializeField]
-    private GameObject targetFlag;
+    private GameObject m_TargetFlag;
     [SerializeField]
-    private Transform parent;
-    private Dictionary<byte, GameObject> placedFlags;
+    private Transform m_Parent;
+    private Dictionary<byte, GameObject> m_PlacedFlags;
 
-    private FlowField flowField;
-    private Cell destinationCell;
+    private FlowField m_FlowField;
+    private Cell m_DestinationCell;
 
-    private List<byte> currentlyUsedFlowFields;
+    private List<byte> m_CurrentlyUsedFlowFields;
 
-    private bool dynamicAStarSwitch = false;
+    private bool m_DynamicAStarSwitch = false;
 
     private void Awake()
     {
@@ -36,18 +36,18 @@ public class FlowFieldManager : MonoBehaviour
 
     void Start()
     {
-        flowField = new FlowField();
+        m_FlowField = new FlowField();
 
-        currentlyUsedFlowFields = new List<byte>();
+        m_CurrentlyUsedFlowFields = new List<byte>();
 
-        placedFlags = new Dictionary<byte, GameObject>();
+        m_PlacedFlags = new Dictionary<byte, GameObject>();
     }
 
     private void Update()
     {
         if (Input.GetMouseButtonDown(1))
         {
-            if (SelectedDictionary.selectedDictionary.Count == 0)
+            if (SelectedDictionary.s_SelectedDictionary.Count == 0)
             {
                 //Debug.Log("No units selected");
                 return;
@@ -55,23 +55,23 @@ public class FlowFieldManager : MonoBehaviour
             else
             {
                 byte indexToUse = 0;
-                for(; indexToUse < byte.MaxValue; indexToUse++) // Search free FlowFieldIndex
+                for(; indexToUse < byte.MaxValue; indexToUse++) // Look for free FlowFieldIndex
                 {
-                    if(!currentlyUsedFlowFields.Contains(indexToUse))
+                    if(!m_CurrentlyUsedFlowFields.Contains(indexToUse))
                     {
-                        currentlyUsedFlowFields.Add(indexToUse);
+                        m_CurrentlyUsedFlowFields.Add(indexToUse);
                         break;
                     }
                 }
-                destinationCell = getClickedCell();
-                if (destinationCell != null)
+                m_DestinationCell = getClickedCell();
+                if (m_DestinationCell != null)
                 {
                     int indexCounter = 0;
-                    foreach (KeyValuePair<int, GameObject> npc in SelectedDictionary.selectedDictionary)
+                    foreach (KeyValuePair<int, GameObject> npc in SelectedDictionary.s_SelectedDictionary)
                     {
-                        if (dynamicAStarSwitch)
+                        if (m_DynamicAStarSwitch)
                         {
-                            npc.Value.GetComponentInParent<NPC>().SetPathfindingDynamic(indexToUse, destinationCell, indexCounter, SelectedDictionary.selectedDictionary.Count);
+                            npc.Value.GetComponentInParent<NPC>().SetPathfindingDynamic(indexToUse, m_DestinationCell, indexCounter, SelectedDictionary.s_SelectedDictionary.Count);
                             indexCounter++;
                         }
                         else
@@ -82,13 +82,13 @@ public class FlowFieldManager : MonoBehaviour
 
                     float startTime = Time.realtimeSinceStartup;
 
-                    flowField.FlowFieldPathfinding(GridCreator.grid, indexToUse, destinationCell);
-                    StartCoroutine(FlowFieldDisplay.instance.CreateFlowFieldDirectionMesh(indexToUse, destinationCell));
+                    m_FlowField.FlowFieldPathfinding(GridCreator.s_Grid, indexToUse, m_DestinationCell);
+                    StartCoroutine(FlowFieldDisplay.Instance.CreateFlowFieldDirectionMesh(indexToUse, m_DestinationCell));
 
                     float endTime = Time.realtimeSinceStartup;
                 }
 
-                placedFlags.Add(indexToUse, Instantiate<GameObject>(targetFlag, new Vector3(destinationCell.xPos, 0.0f, destinationCell.zPos), Quaternion.Euler(-90.0f, Random.Range(0.0f, 360.0f), 0.0f), parent));
+                m_PlacedFlags.Add(indexToUse, Instantiate<GameObject>(m_TargetFlag, new Vector3(m_DestinationCell.m_XPos, 0.0f, m_DestinationCell.m_ZPos), Quaternion.Euler(-90.0f, Random.Range(0.0f, 360.0f), 0.0f), m_Parent));
 
                 CleanUpCurrentlyUsedFlowFields();
             }
@@ -103,17 +103,17 @@ public class FlowFieldManager : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit))
         {
-            // TEMP: limit spawn area to grid size
-            if (hit.point.x < -(0.5 * GridCreator.grid.GetCellSize()) ||
-                hit.point.z < -(0.5 * GridCreator.grid.GetCellSize()) ||
-                hit.point.x > ((GridCreator.grid.GetWidth() * GridCreator.grid.GetCellSize()) - (GridCreator.grid.GetCellSize() / 2.0f)) ||
-                hit.point.z > ((GridCreator.grid.GetHeight() * GridCreator.grid.GetCellSize() - (GridCreator.grid.GetCellSize() / 2.0f))))
+            // Limit spawn area to grid size.
+            if (hit.point.x < -(0.5 * GridCreator.s_Grid.GetCellSize()) ||
+                hit.point.z < -(0.5 * GridCreator.s_Grid.GetCellSize()) ||
+                hit.point.x > ((GridCreator.s_Grid.GetWidth() * GridCreator.s_Grid.GetCellSize()) - (GridCreator.s_Grid.GetCellSize() / 2.0f)) ||
+                hit.point.z > ((GridCreator.s_Grid.GetHeight() * GridCreator.s_Grid.GetCellSize() - (GridCreator.s_Grid.GetCellSize() / 2.0f))))
             {
                 Debug.Log("Unable to get the clicked on cell. Out of bounds!");
             }
             else
             {
-                return GridCreator.grid.getCell(Mathf.RoundToInt(hit.point.x), Mathf.RoundToInt(hit.point.z));
+                return GridCreator.s_Grid.getCell(Mathf.RoundToInt(hit.point.x), Mathf.RoundToInt(hit.point.z));
             }
         }
 
@@ -126,7 +126,7 @@ public class FlowFieldManager : MonoBehaviour
 
         for (byte i = 0; i < byte.MaxValue; i++)
         {
-            foreach (NPC npc in NPCManager.Instance.npcs)
+            foreach (NPC npc in NPCManager.Instance.m_NPCs)
             {
                 if (npc.GetFlowMapIndex() == i)
                 {
@@ -137,11 +137,11 @@ public class FlowFieldManager : MonoBehaviour
         }
 
         List<byte> entriesToRemove = new List<byte>();
-        foreach (byte b in placedFlags.Keys)
+        foreach (byte b in m_PlacedFlags.Keys)
         {
             if (!usedIndices.Contains(b))
             {
-                GameObject temp = placedFlags[b];
+                GameObject temp = m_PlacedFlags[b];
                 entriesToRemove.Add(b);
                 Destroy(temp);
             }
@@ -149,24 +149,24 @@ public class FlowFieldManager : MonoBehaviour
 
         foreach(byte b in entriesToRemove)
         {
-            placedFlags.Remove(b);
+            m_PlacedFlags.Remove(b);
         }
 
-        currentlyUsedFlowFields = usedIndices;
+        m_CurrentlyUsedFlowFields = usedIndices;
     }
 
     public Cell getDestinationCell()
     {
-        return destinationCell;
+        return m_DestinationCell;
     }
 
     public List<byte> GetCurrentlyUsedFlowFields()
     {
-        return currentlyUsedFlowFields;
+        return m_CurrentlyUsedFlowFields;
     }
 
     public void SetDynamicAStarSwitch(bool _value)
     {
-        dynamicAStarSwitch = _value;
+        m_DynamicAStarSwitch = _value;
     }
 }

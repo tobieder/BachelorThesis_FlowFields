@@ -4,19 +4,24 @@ using UnityEngine;
 
 public class FlowField
 {
-    private Cell destination;
-    private Grid grid;
+    private Cell m_Destination;
+    private Grid m_Grid;
 
-    private float vectorIntensity = 10.0f;
+    private float m_VectorIntensity = 10.0f;
 
     public FlowField()
     {
-
     }
 
+    /// <summary>
+    /// Create a Flow Field to the given Destination cell.
+    /// </summary>
+    /// <param name="_grid">The grid the algorithm runs on.</param>
+    /// <param name="_flowMapIndex">Flow Field Layer to attach the result to.</param>
+    /// <param name="_destination">Destination of the pathfinding algorithm.</param>
     public void FlowFieldPathfinding(Grid _grid, byte _flowMapIndex, Cell _destination)
     {
-        grid = _grid;
+        m_Grid = _grid;
 
         CreateIntegrationField(_destination);
         CreateFlowField(_flowMapIndex);
@@ -24,24 +29,25 @@ public class FlowField
 
     private void CreateIntegrationField(Cell _destination)
     {
-        ResetFlowField();
+        ResetIntegrationField();
 
-        destination = _destination;
+        m_Destination = _destination;
 
-        byte oldCost = destination.GetCost();
+        // Save the old cost to later reapply it.
+        byte originalCost = m_Destination.GetCost();
 
-        destination.SetCost(0);
-        destination.SetIntegration(0);
+        // Mark the destination cell.
+        m_Destination.SetCost(0);
+        m_Destination.SetIntegration(0);
 
         Queue<Cell> cellsToCheck = new Queue<Cell>();
 
-        cellsToCheck.Enqueue(destination);
+        cellsToCheck.Enqueue(m_Destination);
 
         while (cellsToCheck.Count > 0)
         {
             Cell currCell = cellsToCheck.Dequeue();
 
-            //List<Cell> neighbors = GetNeighbors(currCell.xIndex, currCell.zIndex, false);
             List<Cell> neighbors = currCell.GetNeighbors();
 
             foreach (Cell neighbor in neighbors)
@@ -58,12 +64,13 @@ public class FlowField
             }
         }
 
-        destination.SetCost(oldCost);
+        // Reset to the saved cost value.
+        m_Destination.SetCost(originalCost);
     }
 
     private void CreateFlowField(byte _flowMapIndex)
     {
-        foreach(Cell cell in grid.GetGridArray())
+        foreach(Cell cell in m_Grid.GetGridArray())
         {
             if (cell.GetCost() != byte.MaxValue)
             {
@@ -76,7 +83,7 @@ public class FlowField
                     if (neighbor.GetIntegration() < bestCost)
                     {
                         bestCost = neighbor.GetIntegration();
-                        cell.SetFlowFieldDirection(_flowMapIndex, new Vector3(neighbor.xPos - cell.xPos, 0.0f, neighbor.zPos - cell.zPos).normalized * vectorIntensity);
+                        cell.SetFlowFieldDirection(_flowMapIndex, new Vector3(neighbor.m_XPos - cell.m_XPos, 0.0f, neighbor.m_ZPos - cell.m_ZPos).normalized * m_VectorIntensity);
                     }
                 }
             }
@@ -87,9 +94,9 @@ public class FlowField
         }
     }
 
-    private void ResetFlowField()
+    private void ResetIntegrationField()
     {
-        foreach(Cell cell in grid.GetGridArray())
+        foreach(Cell cell in m_Grid.GetGridArray())
         {
             cell.SetIntegration(ushort.MaxValue);
         }

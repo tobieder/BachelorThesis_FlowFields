@@ -12,7 +12,6 @@ public class SideMesh : MonoBehaviour
     private MeshFilter m_MeshFilter;
     private MeshRenderer m_MeshRenderer;
 
-    // Start is called before the first frame update
     void Start()
     {
         CreateSideMesh();
@@ -48,7 +47,7 @@ public class SideMesh : MonoBehaviour
         Vector2[] uvs = new Vector2[16];
         int[] triangles = new int[8 * 3];
 
-        Grid grid = GridCreator.grid;
+        Grid grid = GridCreator.s_Grid;
 
         #region MeshCreation
 

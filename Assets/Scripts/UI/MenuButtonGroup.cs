@@ -4,29 +4,29 @@ using UnityEngine;
 
 public class MenuButtonGroup : MonoBehaviour
 {
-    public Color tabIdle;
-    public Color tabHover;
-    public Color tabActive;
+    public Color m_TabIdle;
+    public Color m_TabHover;
+    public Color m_TabActive;
 
-    private List<MenuButton> menuButtons;
-    private MenuButton selectedButton;
+    private List<MenuButton> m_MenuButtons;
+    private MenuButton m_SelectedButton;
 
     public void Subscribe(MenuButton _menuButton)
     {
-        if (menuButtons == null)
+        if (m_MenuButtons == null)
         {
-            menuButtons = new List<MenuButton>();
+            m_MenuButtons = new List<MenuButton>();
         }
 
-        menuButtons.Add(_menuButton);
+        m_MenuButtons.Add(_menuButton);
     }
 
     public void OnTabEnter(MenuButton _menuButton)
     {
         ResetTabs();
-        if (selectedButton == null || _menuButton != selectedButton)
+        if (m_SelectedButton == null || _menuButton != m_SelectedButton)
         {
-            _menuButton.SetTint(tabHover);
+            _menuButton.SetTint(m_TabHover);
         }
     }
 
@@ -38,41 +38,41 @@ public class MenuButtonGroup : MonoBehaviour
     public void OnTabSelected(MenuButton _menuButton)
     {
         ResetTabs();
-        if(selectedButton != null)
+        if(m_SelectedButton != null)
         {
-            selectedButton.Deselect();
+            m_SelectedButton.Deselect();
         }
 
-        if (selectedButton == _menuButton)
+        if (m_SelectedButton == _menuButton)
         {
-            selectedButton = null;
+            m_SelectedButton = null;
         }
         else
         {
-            selectedButton = _menuButton;
-            selectedButton.Select();
-            _menuButton.SetTint(tabActive);
+            m_SelectedButton = _menuButton;
+            m_SelectedButton.Select();
+            _menuButton.SetTint(m_TabActive);
         }
     }
 
     private void ResetTabs()
     {
-        foreach (MenuButton _menuButton in menuButtons)
+        foreach (MenuButton _menuButton in m_MenuButtons)
         {
-            if (selectedButton != null && _menuButton == selectedButton)
+            if (m_SelectedButton != null && _menuButton == m_SelectedButton)
             {
                 continue;
             }
-            _menuButton.SetTint(tabIdle);
+            _menuButton.SetTint(m_TabIdle);
         }
     }
 
     private void OnDisable()
     {
-        if (selectedButton != null)
+        if (m_SelectedButton != null)
         {
-            selectedButton.Deselect();
-            selectedButton = null;
+            m_SelectedButton.Deselect();
+            m_SelectedButton = null;
         }
         ResetTabs();
     }

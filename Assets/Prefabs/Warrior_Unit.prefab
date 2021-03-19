@@ -1274,10 +1274,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65e82b53d7a66794bac22008c86d1d01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 1
+  m_MaxSpeed: 1
   m_PathfingingMethod: 0
-  targetRadius: 1
-  arriveRadius: 6
+  m_TargetRadius: 2
+  m_ArriveRadius: 5
 --- !u!1 &8164827514738866886
 GameObject:
   m_ObjectHideFlags: 0

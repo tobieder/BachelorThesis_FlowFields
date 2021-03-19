@@ -16,14 +16,14 @@ public enum DisplayInfo
 public class FlowFieldDebug : MonoBehaviour
 {
 
-    public DisplayInfo displayInfo;
+    public DisplayInfo m_DisplayInfo;
 
-    public byte flowFieldLayer = byte.MaxValue;
+    public byte m_FlowFieldLayer = byte.MaxValue;
 
     private void OnDrawGizmos()
     {
 #if UNITY_EDITOR
-        if(GridCreator.grid == null)
+        if(GridCreator.s_Grid == null)
         {
             return;
         }
@@ -31,32 +31,32 @@ public class FlowFieldDebug : MonoBehaviour
         GUIStyle style = new GUIStyle(GUI.skin.label);
         style.alignment = TextAnchor.MiddleCenter;
 
-        switch(displayInfo)
+        switch(m_DisplayInfo)
         {
             case DisplayInfo.None:
                 break;
             case DisplayInfo.Index:
-                foreach (Cell cell in GridCreator.grid.GetGridArray())
+                foreach (Cell cell in GridCreator.s_Grid.GetGridArray())
                 {
-                    Handles.Label(new Vector3(cell.xPos, 0.0f, cell.zPos), "(" + cell.xIndex + ", " + cell.zIndex + ")", style);
+                    Handles.Label(new Vector3(cell.m_XPos, 0.0f, cell.m_ZPos), "(" + cell.m_XIndex + ", " + cell.m_ZIndex + ")", style);
                 };
                 break;
             case DisplayInfo.Cost:
-                foreach(Cell cell in GridCreator.grid.GetGridArray())
+                foreach(Cell cell in GridCreator.s_Grid.GetGridArray())
                 {
-                    Handles.Label(new Vector3(cell.xPos, 0.0f, cell.zPos), cell.GetCost().ToString(), style);
+                    Handles.Label(new Vector3(cell.m_XPos, 0.0f, cell.m_ZPos), cell.GetCost().ToString(), style);
                 };
                 break;
             case DisplayInfo.Integration:
-                foreach (Cell cell in GridCreator.grid.GetGridArray())
+                foreach (Cell cell in GridCreator.s_Grid.GetGridArray())
                 {
-                    Handles.Label(new Vector3(cell.xPos, 0.0f, cell.zPos), cell.GetIntegration().ToString(), style);
+                    Handles.Label(new Vector3(cell.m_XPos, 0.0f, cell.m_ZPos), cell.GetIntegration().ToString(), style);
                 };
                 break;
             case DisplayInfo.FlowFieldDirection:
-                foreach (Cell cell in GridCreator.grid.GetGridArray())
+                foreach (Cell cell in GridCreator.s_Grid.GetGridArray())
                 {
-                    DrawArrow.ForDebug(new Vector3(cell.xPos, 0.0f, cell.zPos), cell.GetFlowFieldDirection(flowFieldLayer).normalized * 0.5f, Color.red);
+                    DrawArrow.ForDebug(new Vector3(cell.m_XPos, 0.0f, cell.m_ZPos), cell.GetFlowFieldDirection(m_FlowFieldLayer).normalized * 0.5f, Color.red);
                 };
                 break;
             default:

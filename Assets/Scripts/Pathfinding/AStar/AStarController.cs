@@ -4,21 +4,21 @@ using UnityEngine;
 
 public class AStarController : MonoBehaviour
 {
-    public Material pathMaterial;
+    public Material m_PathMaterial;
 
-    private AStarPathfinding pathfinding;
-    private List<GameObject> pathGOs = new List<GameObject>();
+    private AStarPathfinding m_Pathfinding;
+    private List<GameObject> m_PathGOs = new List<GameObject>();
 
     void Start()
     {
-        pathfinding = new AStarPathfinding();
+        m_Pathfinding = new AStarPathfinding();
     }
 
     void Update()
     {
         if (Input.GetMouseButtonDown(1))
         {
-            if(SelectedDictionary.selectedDictionary.Count == 0)
+            if(SelectedDictionary.s_SelectedDictionary.Count == 0)
             {
                 Debug.Log("No Units selected.");
             }
@@ -27,17 +27,16 @@ public class AStarController : MonoBehaviour
                 Cell clickedCell = getClickedCell();
                 if (clickedCell != null)
                 {
-                    foreach(GameObject pathGO in pathGOs)
+                    foreach(GameObject pathGO in m_PathGOs)
                     {
                         Destroy(pathGO, 0.5f);
                     }
-                    pathGOs = new List<GameObject>();
+                    m_PathGOs = new List<GameObject>();
 
-                    foreach (KeyValuePair<int, GameObject> npc in SelectedDictionary.selectedDictionary)
+                    foreach (KeyValuePair<int, GameObject> npc in SelectedDictionary.s_SelectedDictionary)
                     {
-                        //npc.Value.GetComponentInParent<NPC>().SetFlowMapIndex(indexToUse);
                         Vector3 pos = new Vector3(npc.Value.GetComponentInParent<NPC>().transform.position.x, 0.0f, npc.Value.GetComponentInParent<NPC>().transform.position.z);
-                        List<Cell> path = pathfinding.FindPath(GridCreator.grid, GridCreator.grid.getCellFromPosition(pos.x, pos.z), clickedCell);
+                        List<Cell> path = m_Pathfinding.FindPath(GridCreator.s_Grid, GridCreator.s_Grid.getCellFromPosition(pos.x, pos.z), clickedCell);
 
                         if (path != null)
                         {
@@ -49,21 +48,18 @@ public class AStarController : MonoBehaviour
 
                             for (int i = 0; i < path.Count - 1; i++)
                             {
-                                //Debug.DrawLine(new Vector3(path[i].xPos, 0.0f, path[i].zPos) * 10f + Vector3.one * 5f, new Vector3(path[i + 1].xPos, 0.0f, path[i + 1].zPos) * 10f + Vector3.one * 5f, Color.green, 1000.0f);
-                                //Debug.DrawLine(new Vector3(path[i].xPos, 0.0f, path[i].zPos), new Vector3(path[i + 1].xPos, 0.0f, path[i + 1].zPos), Color.green, 10.0f);
-
-                                pathPositions[i] = new Vector3(path[i].xPos, 0.01f, path[i].zPos);
+                                pathPositions[i] = new Vector3(path[i].m_XPos, 0.01f, path[i].m_ZPos);
                             }
 
-                            pathPositions[path.Count - 1] = new Vector3(path[path.Count - 1].xPos, 0.01f, path[path.Count - 1].zPos);
+                            pathPositions[path.Count - 1] = new Vector3(path[path.Count - 1].m_XPos, 0.01f, path[path.Count - 1].m_ZPos);
 
                             GameObject pathGO = new GameObject("Unit" + npc.Key + "Path");
                             pathGO.transform.parent = this.transform;
-                            pathGOs.Add(pathGO);
+                            m_PathGOs.Add(pathGO);
 
                             LineRenderer pathRenderer = pathGO.AddComponent<LineRenderer>();
 
-                            pathRenderer.sharedMaterial = pathMaterial;
+                            pathRenderer.sharedMaterial = m_PathMaterial;
                             pathRenderer.startWidth = 0.2f;
                             pathRenderer.endWidth = 0.2f;
                             pathRenderer.positionCount = pathPositions.Length;
@@ -86,16 +82,16 @@ public class AStarController : MonoBehaviour
         if (Physics.Raycast(ray, out hit))
         {
             // TEMP: limit spawn area to grid size
-            if (hit.point.x < -(0.5 * GridCreator.grid.GetCellSize()) ||
-                hit.point.z < -(0.5 * GridCreator.grid.GetCellSize()) ||
-                hit.point.x > ((GridCreator.grid.GetWidth() * GridCreator.grid.GetCellSize()) - (GridCreator.grid.GetCellSize() / 2.0f)) ||
-                hit.point.z > ((GridCreator.grid.GetHeight() * GridCreator.grid.GetCellSize() - (GridCreator.grid.GetCellSize() / 2.0f))))
+            if (hit.point.x < -(0.5 * GridCreator.s_Grid.GetCellSize()) ||
+                hit.point.z < -(0.5 * GridCreator.s_Grid.GetCellSize()) ||
+                hit.point.x > ((GridCreator.s_Grid.GetWidth() * GridCreator.s_Grid.GetCellSize()) - (GridCreator.s_Grid.GetCellSize() / 2.0f)) ||
+                hit.point.z > ((GridCreator.s_Grid.GetHeight() * GridCreator.s_Grid.GetCellSize() - (GridCreator.s_Grid.GetCellSize() / 2.0f))))
             {
                 Debug.Log("Unable to get the clicked on cell. Out of bounds!");
             }
             else
             {
-                return GridCreator.grid.getCell((int)hit.point.x, (int)hit.point.z);
+                return GridCreator.s_Grid.getCell((int)hit.point.x, (int)hit.point.z);
             }
         }
 

@@ -7,33 +7,33 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(Image))]
 public class TabButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    public TabGroup tabGroup;
+    public TabGroup m_TabGroup;
 
-    private Image background;
+    private Image m_Background;
 
     void Start()
     {
-        background = GetComponent<Image>();
-        tabGroup.Subscribe(this);
+        m_Background = GetComponent<Image>();
+        m_TabGroup.Subscribe(this);
     }
 
     public void SetTint(Color _color)
     {
-        background.color = _color;
+        m_Background.color = _color;
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        tabGroup.OnTabSelected(this);
+        m_TabGroup.OnTabSelected(this);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        tabGroup.OnTabEnter(this);
+        m_TabGroup.OnTabEnter(this);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        tabGroup.OnTabExit(this);
+        m_TabGroup.OnTabExit(this);
     }
 }

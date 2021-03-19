@@ -4,132 +4,127 @@ using UnityEngine;
 
 public class Grid
 {
-    private int width;
-    private int height;
+    private int m_Width;
+    private int m_Height;
 
-    private float cellSize;
+    private float m_CellSize;
 
-    private Cell[,] gridArray;
-    //private TextMesh[,] debugTextArray;
+    private Cell[,] m_GridArray;
 
     public Grid(int _width, int _height, float _cellSize)
     {
-        width = _width;
-        height = _height;
-        cellSize = _cellSize;
+        m_Width = _width;
+        m_Height = _height;
+        m_CellSize = _cellSize;
 
-        gridArray = new Cell[width, height];
-        //debugTextArray = new TextMesh[width, height];
+        m_GridArray = new Cell[m_Width, m_Height];
 
-        Vector3 _gridOffset = new Vector3(cellSize, 0.0f, cellSize) * 0.5f;
-
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < m_Width; x++)
         {
-            for (int z = 0; z < height; z++)
+            for (int z = 0; z < m_Height; z++)
             {
-                gridArray[x, z] = new Cell(this, x * cellSize, z * cellSize, x, z, 1); // Get cost from ground texture
+                m_GridArray[x, z] = new Cell(this, x * m_CellSize, z * m_CellSize, x, z, 1);
+                // Cost will be set from ground texture.
 
-                gridArray[x, z].SetFlowFieldDirection(byte.MaxValue, new Vector3(0.0f, 0.0f, 0.0f));
+                m_GridArray[x, z].SetFlowFieldDirection(byte.MaxValue, new Vector3(0.0f, 0.0f, 0.0f));
             }
         }
     }
 
     public void InitializeNeighbors()
     {
-        for (int x = 0; x < gridArray.GetLength(0); x++)
+        for (int x = 0; x < m_GridArray.GetLength(0); x++)
         {
-            for (int z = 0; z < gridArray.GetLength(1); z++)
+            for (int z = 0; z < m_GridArray.GetLength(1); z++)
             {
-                gridArray[x, z].SetNeighbors();
+                m_GridArray[x, z].SetNeighbors();
             }
         }
     }
 
     public void InitializeFFVectorsRandom(byte _index)
     {
-        for (int x = 0; x < gridArray.GetLength(0); x++)
+        for (int x = 0; x < m_GridArray.GetLength(0); x++)
         {
-            for (int z = 0; z < gridArray.GetLength(1); z++)
+            for (int z = 0; z < m_GridArray.GetLength(1); z++)
             {
-                gridArray[x, z].SetFlowFieldDirection(_index, new Vector3(Random.Range(-1.0f, 1.0f), 0.0f, Random.Range(-1.0f, 1.0f)).normalized * 0.5f);
+                m_GridArray[x, z].SetFlowFieldDirection(_index, new Vector3(Random.Range(-1.0f, 1.0f), 0.0f, Random.Range(-1.0f, 1.0f)).normalized * 0.5f);
             }
         }
     }
 
     public void InitializeFFVectors(byte _index, Vector3 direction)
     {
-        for (int x = 0; x < gridArray.GetLength(0); x++)
+        for (int x = 0; x < m_GridArray.GetLength(0); x++)
         {
-            for (int z = 0; z < gridArray.GetLength(1); z++)
+            for (int z = 0; z < m_GridArray.GetLength(1); z++)
             {
-                gridArray[x, z].SetFlowFieldDirection(_index, direction);
+                m_GridArray[x, z].SetFlowFieldDirection(_index, direction);
             }
         }
     }
 
     public void InitializeFFVectors(byte _index, Vector3[,] directions)
     {
-        for (int x = 0; x < gridArray.GetLength(0); x++)
+        for (int x = 0; x < m_GridArray.GetLength(0); x++)
         {
-            for (int z = 0; z < gridArray.GetLength(1); z++)
+            for (int z = 0; z < m_GridArray.GetLength(1); z++)
             {
-                gridArray[x, z].SetFlowFieldDirection(_index, directions[x, z]);
+                m_GridArray[x, z].SetFlowFieldDirection(_index, directions[x, z]);
             }
         }
     }
 
     public Cell getCell(int x, int z)
     {
-        if(x >= 0 && x < width && z >= 0 && z < height)
+        if(x >= 0 && x < m_Width && z >= 0 && z < m_Height)
         {
-            return gridArray[x, z];
+            return m_GridArray[x, z];
         }
 
-        //Debug.LogError("Grid.GetCell(x, z): x or z value out of Range.");
         return null;
     }
 
     public Cell getCellFromPosition(float x, float z)
     {
-        int _x = Mathf.RoundToInt(x / cellSize);
-        int _z = Mathf.RoundToInt(z / cellSize);
+        int _x = Mathf.RoundToInt(x / m_CellSize);
+        int _z = Mathf.RoundToInt(z / m_CellSize);
 
         return getCell(_x, _z);
     }
 
     public void SetValue(byte _index, int _x, int _z, Vector3 value)
     {
-        if (_x >= 0 && _x < width && _z >= 0 && _z < height)
+        if (_x >= 0 && _x < m_Width && _z >= 0 && _z < m_Height)
         {
-            gridArray[_x, _z].SetFlowFieldDirection(_index, value.normalized);
-            //debugTextArray[_x, _z].text = gridArray[_x, _z].flowFieldDirection.ToString();
+            m_GridArray[_x, _z].SetFlowFieldDirection(_index, value.normalized);
         }
     }
 
     public Vector3 GetWorldPositon(int x, int z)
     {
-        return new Vector3(x, 0.0f, z) * cellSize;
+        return new Vector3(x, 0.0f, z) * m_CellSize;
     }
 
     public int GetWidth()
     {
-        return width;
+        return m_Width;
     }
 
     public int GetHeight()
     {
-        return height;
+        return m_Height;
     }
 
     public float GetCellSize()
     {
-        return cellSize;
+        return m_CellSize;
     }
 
     public Cell[,] GetGridArray()
     {
-        if (gridArray != null)
-            return gridArray;
+        if (m_GridArray != null)
+            return m_GridArray;
         else
             return null;
     }

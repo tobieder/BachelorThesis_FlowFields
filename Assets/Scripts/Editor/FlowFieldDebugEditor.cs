@@ -11,9 +11,9 @@ public class FlowFieldDebugEditor : Editor
     {
         FlowFieldDebug flowFieldDebug = (FlowFieldDebug)target;
 
-        flowFieldDebug.displayInfo = (DisplayInfo)EditorGUILayout.EnumPopup("Display Info", flowFieldDebug.displayInfo);
+        flowFieldDebug.m_DisplayInfo = (DisplayInfo)EditorGUILayout.EnumPopup("Display Info", flowFieldDebug.m_DisplayInfo);
 
-        if (flowFieldDebug.displayInfo == DisplayInfo.FlowFieldDirection)
+        if (flowFieldDebug.m_DisplayInfo == DisplayInfo.FlowFieldDirection)
         {
             if(FlowFieldManager.Instance == null)
             {
@@ -31,7 +31,7 @@ public class FlowFieldDebugEditor : Editor
                 }
 
                 buttonIndex = GUILayout.SelectionGrid(buttonIndex, selStrings.ToArray(), 1);
-                flowFieldDebug.flowFieldLayer = usedFlowFields[buttonIndex];
+                flowFieldDebug.m_FlowFieldLayer = usedFlowFields[buttonIndex];
                 Repaint();
             }
         }

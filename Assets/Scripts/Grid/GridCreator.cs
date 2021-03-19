@@ -8,15 +8,13 @@ public class GridCreator : MonoBehaviour
     private static GridCreator _instance;
     public static GridCreator Instance { get { return _instance; } }
 
-    public bool useFile;
+    public int m_Width = 400;
+    public int m_Height = 400;
+    public float m_CellSize = 1.0f;
 
-    public int width = 400;
-    public int height = 400;
-    public float cellSize = 1.0f;
+    public float3 m_DefaultFlowFieldDirection;
 
-    public float3 defaultFlowFieldDirection;
-
-    public static Grid grid;
+    public static Grid s_Grid;
 
     private void Awake()
     {
@@ -34,26 +32,15 @@ public class GridCreator : MonoBehaviour
     {
         if(GameManager.instance != null && GameManager.instance.GetSelectedMapSize() != 0)
         {
-            width = height = GameManager.instance.GetSelectedMapSize();
+            m_Width = m_Height = GameManager.instance.GetSelectedMapSize();
         }
         InitialzeGrid();
     }
 
     public void InitialzeGrid()
     {
-
-        HandlePreCalculatedFlowFieldFile directions = GetComponent<HandlePreCalculatedFlowFieldFile>();
-        if(directions.input != null && useFile)
-        {
-            grid = new Grid(directions.GetWidth(), directions.GetHeight(), cellSize);
-            grid.InitializeFFVectors(byte.MaxValue, directions.GetFlowFieldVectors());
-            grid.InitializeNeighbors();
-        }
-        else
-        { 
-            grid = new Grid(width, height, cellSize);
-            grid.InitializeFFVectors(byte.MaxValue, defaultFlowFieldDirection);
-            grid.InitializeNeighbors();
-        }
+        s_Grid = new Grid(m_Width, m_Height, m_CellSize);
+        s_Grid.InitializeFFVectors(byte.MaxValue, m_DefaultFlowFieldDirection);
+        s_Grid.InitializeNeighbors();
     }
 }

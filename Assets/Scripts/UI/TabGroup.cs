@@ -4,30 +4,30 @@ using UnityEngine;
 
 public class TabGroup : MonoBehaviour
 {
-    public Color tabIdle;
-    public Color tabHover;
-    public Color tabActive;
+    public Color m_TabIdle;
+    public Color m_TabHover;
+    public Color m_TabActive;
 
-    public List<GameObject> tabPages;
+    public List<GameObject> m_TabPages;
 
-    private List<TabButton> tabButtons;
-    private TabButton selectedTab;
+    private List<TabButton> m_TabButtons;
+    private TabButton m_SelectedTab;
 
     public void Subscribe(TabButton _tabButton)
     {
-        if(tabButtons == null)
+        if(m_TabButtons == null)
         {
-            tabButtons = new List<TabButton>();
+            m_TabButtons = new List<TabButton>();
         }
 
-        tabButtons.Add(_tabButton);
+        m_TabButtons.Add(_tabButton);
     }
     public void OnTabEnter(TabButton _tabButton)
     {
         ResetTabs();
-        if (selectedTab == null || _tabButton != selectedTab)
+        if (m_SelectedTab == null || _tabButton != m_SelectedTab)
         {
-            _tabButton.SetTint(tabHover);
+            _tabButton.SetTint(m_TabHover);
         }
     }
 
@@ -39,28 +39,28 @@ public class TabGroup : MonoBehaviour
     public void OnTabSelected(TabButton _tabButton)
     {
         ResetTabs();
-        if (selectedTab == _tabButton)
+        if (m_SelectedTab == _tabButton)
         {
-            selectedTab = null;
+            m_SelectedTab = null;
 
             int selectedIndex = _tabButton.transform.GetSiblingIndex();
-            tabPages[selectedIndex].SetActive(false);
+            m_TabPages[selectedIndex].SetActive(false);
         }
         else
         {
-            selectedTab = _tabButton;
-            _tabButton.SetTint(tabActive);
+            m_SelectedTab = _tabButton;
+            _tabButton.SetTint(m_TabActive);
 
             int selectedIndex = _tabButton.transform.GetSiblingIndex();
-            for (int i = 0; i < tabPages.Count; i++)
+            for (int i = 0; i < m_TabPages.Count; i++)
             {
                 if (i == selectedIndex)
                 {
-                    tabPages[i].SetActive(true);
+                    m_TabPages[i].SetActive(true);
                 }
                 else
                 {
-                    tabPages[i].SetActive(false);
+                    m_TabPages[i].SetActive(false);
                 }
             }
         }
@@ -68,13 +68,13 @@ public class TabGroup : MonoBehaviour
 
     private void ResetTabs()
     {
-        foreach(TabButton _tabButton in tabButtons)
+        foreach(TabButton _tabButton in m_TabButtons)
         {
-            if(selectedTab != null && _tabButton == selectedTab)
+            if(m_SelectedTab != null && _tabButton == m_SelectedTab)
             { 
                 continue; 
             }
-            _tabButton.SetTint(tabIdle);
+            _tabButton.SetTint(m_TabIdle);
         }
     }
 }

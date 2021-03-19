@@ -9,29 +9,28 @@ public class CameraController : MonoBehaviour
     private static CameraController _instance;
     public static CameraController Instance { get { return _instance; } }
 
-    public Transform cameraTransform;
+    public Transform m_CameraTransform;
 
-    public float normalSpeed;
-    public float fastSpeed;
+    public float m_NormalSpeed;
+    public float m_FastSpeed;
 
-    public float movementSpeed;
-    public float movementTime;
-    public float rotationAmount;
-    public Vector3 zoomAmount;
+    public float m_MovementSpeed;
+    public float m_MovementTime;
+    public float m_RotationAmount;
+    public Vector3 m_ZoomAmount;
 
-    public float minZoom;
-    public float maxZoom;
+    public float m_MinZoom;
+    public float m_MaxZoom;
 
-    private Vector3 newPosition;
-    private Quaternion newRotation;
-    private Vector3 newZoom;
+    private Vector3 m_NewPosition;
+    private Quaternion m_NewRotation;
+    private Vector3 m_NewZoom;
 
-    private Vector3 rotateStartPosition;
-    private Vector3 rotateCurrentPosition;
+    private Vector3 m_RotateStartPosition;
+    private Vector3 m_RotateCurrentPosition;
 
-    private Grid grid;
-    private float maxWidth;
-    private float maxHeight;
+    private float m_MaxWidth;
+    private float m_MaxHeight;
 
     private void Awake()
     {
@@ -48,13 +47,13 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        newPosition = transform.position;
-        newRotation = transform.rotation;
-        newZoom = cameraTransform.localPosition;
+        m_NewPosition = transform.position;
+        m_NewRotation = transform.rotation;
+        m_NewZoom = m_CameraTransform.localPosition;
 
-        grid = GridCreator.grid;
-        maxWidth = grid.GetWidth() * grid.GetCellSize();
-        maxHeight = grid.GetHeight() * grid.GetCellSize();
+        Grid grid = GridCreator.s_Grid;
+        m_MaxWidth = grid.GetWidth() * grid.GetCellSize();
+        m_MaxHeight = grid.GetHeight() * grid.GetCellSize();
     }
 
     // Update is called once per frame
@@ -67,40 +66,40 @@ public class CameraController : MonoBehaviour
 
     void HandleInput()
     {
-        newPosition.x = Mathf.Clamp(newPosition.x, 0.0f, maxWidth);
-        newPosition.z = Mathf.Clamp(newPosition.z, 0.0f, maxHeight);
+        m_NewPosition.x = Mathf.Clamp(m_NewPosition.x, 0.0f, m_MaxWidth);
+        m_NewPosition.z = Mathf.Clamp(m_NewPosition.z, 0.0f, m_MaxHeight);
 
-        transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * movementTime);
-        transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, Time.deltaTime * movementTime);
+        transform.position = Vector3.Lerp(transform.position, m_NewPosition, Time.deltaTime * m_MovementTime);
+        transform.rotation = Quaternion.Lerp(transform.rotation, m_NewRotation, Time.deltaTime * m_MovementTime);
 
-        newZoom.y = Mathf.Clamp(newZoom.y, minZoom, maxZoom);
-        newZoom.z = Mathf.Clamp(newZoom.z, -maxZoom, -minZoom);
+        m_NewZoom.y = Mathf.Clamp(m_NewZoom.y, m_MinZoom, m_MaxZoom);
+        m_NewZoom.z = Mathf.Clamp(m_NewZoom.z, -m_MaxZoom, -m_MinZoom);
 
-        cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, newZoom, Time.deltaTime * movementTime);
+        m_CameraTransform.localPosition = Vector3.Lerp(m_CameraTransform.localPosition, m_NewZoom, Time.deltaTime * m_MovementTime);
     }
 
     void HandleMouseInput()
     {
         if(Input.mouseScrollDelta.y != 0)
         {
-            newZoom += Input.mouseScrollDelta.y * zoomAmount;
+            m_NewZoom += Input.mouseScrollDelta.y * m_ZoomAmount;
         }
 
         if (!EventSystem.current.IsPointerOverGameObject())
         {
             if (Input.GetMouseButtonDown(2))
             {
-                rotateStartPosition = Input.mousePosition;
+                m_RotateStartPosition = Input.mousePosition;
             }
             if (Input.GetMouseButton(2))
             {
-                rotateCurrentPosition = Input.mousePosition;
+                m_RotateCurrentPosition = Input.mousePosition;
 
-                Vector3 _difference = rotateStartPosition - rotateCurrentPosition;
+                Vector3 _difference = m_RotateStartPosition - m_RotateCurrentPosition;
 
-                rotateStartPosition = rotateCurrentPosition;
+                m_RotateStartPosition = m_RotateCurrentPosition;
 
-                newRotation *= Quaternion.Euler(Vector3.up * (-_difference.x / 5f));
+                m_NewRotation *= Quaternion.Euler(Vector3.up * (-_difference.x / 5f));
             }
         }
     }
@@ -109,46 +108,46 @@ public class CameraController : MonoBehaviour
     {
         if(Input.GetKey(KeyCode.LeftShift))
         {
-            movementSpeed = fastSpeed;
+            m_MovementSpeed = m_FastSpeed;
         }
         else
         {
-            movementSpeed = normalSpeed;
+            m_MovementSpeed = m_NormalSpeed;
         }
 
         if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
-            newPosition += (transform.forward * movementSpeed);
+            m_NewPosition += (transform.forward * m_MovementSpeed);
         }
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
-            newPosition += (transform.forward * -movementSpeed);
+            m_NewPosition += (transform.forward * -m_MovementSpeed);
         }
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
-            newPosition += (transform.right * movementSpeed);
+            m_NewPosition += (transform.right * m_MovementSpeed);
         }
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
-            newPosition += (transform.right * -movementSpeed);
+            m_NewPosition += (transform.right * -m_MovementSpeed);
         }
 
         if(Input.GetKey(KeyCode.Q))
         {
-            newRotation *= Quaternion.Euler(Vector3.up * rotationAmount);
+            m_NewRotation *= Quaternion.Euler(Vector3.up * m_RotationAmount);
         }
         if (Input.GetKey(KeyCode.E))
         {
-            newRotation *= Quaternion.Euler(Vector3.up * -rotationAmount);
+            m_NewRotation *= Quaternion.Euler(Vector3.up * -m_RotationAmount);
         }
 
         if(Input.GetKey(KeyCode.R))
         {
-            newZoom += zoomAmount;
+            m_NewZoom += m_ZoomAmount;
         }
         if(Input.GetKey(KeyCode.F))
         {
-            newZoom -= zoomAmount;
+            m_NewZoom -= m_ZoomAmount;
         }
     }
 }

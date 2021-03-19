@@ -7,7 +7,7 @@ public class NPCManager : MonoBehaviour
     private static NPCManager _instance;
     public static NPCManager Instance { get { return _instance; } }
 
-    public List<NPC> npcs;
+    public List<NPC> m_NPCs;
 
     private void Awake()
     {
@@ -23,7 +23,7 @@ public class NPCManager : MonoBehaviour
 
     private void Start()
     {
-        npcs = new List<NPC>();
+        m_NPCs = new List<NPC>();
     }
 
     public void ApplyPhysics(bool _val)

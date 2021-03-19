@@ -5,12 +5,12 @@ using UnityEngine.EventSystems;
 
 public class DestroyBuilding : MonoBehaviour
 {
-    public LayerMask layerMask;
+    public LayerMask m_LayerMask;
 
-    public Material previewDestroy;
+    public Material m_PreviewDestroy;
 
-    private Material[] originalMaterials;
-    private GameObject oldGO;
+    private Material[] m_OriginalMaterials;
+    private GameObject m_OldGO;
 
     private void Update()
     {
@@ -20,18 +20,18 @@ public class DestroyBuilding : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit, 50000.0f, layerMask))
+            if (Physics.Raycast(ray, out hit, 50000.0f, m_LayerMask))
             {
                 GameObject goToDestroy = hit.transform.gameObject;
                 Renderer goRenderer = goToDestroy.GetComponent<Renderer>();
                 Vector3 goSize = goRenderer.bounds.size;
 
-                if(oldGO == null)
+                if(m_OldGO == null)
                 {
-                    originalMaterials = goRenderer.materials;
+                    m_OriginalMaterials = goRenderer.materials;
                 }
 
-                goRenderer.material = previewDestroy;
+                goRenderer.material = m_PreviewDestroy;
 
                 if (Input.GetMouseButtonDown(0))
                 {
@@ -55,7 +55,7 @@ public class DestroyBuilding : MonoBehaviour
                             for (int z = Mathf.FloorToInt(-goSize.z / 2f) + 1; z < (int)(goSize.z / 2f); z++)
                             {
                                 Vector3 currPos = new Vector3(goToDestroy.transform.position.x + x + offset.x, 0.0f, goToDestroy.transform.position.z + z + offset.z);
-                                Cell currCell = GridCreator.grid.getCellFromPosition(currPos.x, currPos.z);
+                                Cell currCell = GridCreator.s_Grid.getCellFromPosition(currPos.x, currPos.z);
                                 currCell.SetCost(currCell.GetOriginalCost());
                             }
                         }
@@ -64,22 +64,22 @@ public class DestroyBuilding : MonoBehaviour
                     {
                         // TODO: Only 1x1 objects working rn
                         Vector3 currPos = currPos = new Vector3(goToDestroy.transform.localPosition.x, 0.0f, goToDestroy.transform.localPosition.z);
-                        Cell currCell = GridCreator.grid.getCellFromPosition(currPos.x, currPos.z);
+                        Cell currCell = GridCreator.s_Grid.getCellFromPosition(currPos.x, currPos.z);
                         currCell.SetCost(currCell.GetOriginalCost());
                     }
 
                     Destroy(goToDestroy, 0.02f);
                 }
-                oldGO = goToDestroy;
+                m_OldGO = goToDestroy;
             }
             else
             {
-                if(oldGO != null)
+                if(m_OldGO != null)
                 {
-                    Debug.Log("Moved away from " + oldGO.name);
-                    oldGO.GetComponent<Renderer>().materials = originalMaterials;
+                    Debug.Log("Moved away from " + m_OldGO.name);
+                    m_OldGO.GetComponent<Renderer>().materials = m_OriginalMaterials;
                 }
-                oldGO = null;
+                m_OldGO = null;
             }
         }
     }

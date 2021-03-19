@@ -7,8 +7,8 @@ public class AStarPathfinding
     private const int MOVE_STRAIGHT_COST = 10;
     private const int MOVE_DIAGONAL_COST = 14;
 
-    private List<Cell> openList;
-    private List<Cell> closedList;
+    private List<Cell> m_OpenList;
+    private List<Cell> m_ClosedList;
 
     public AStarPathfinding()
     {
@@ -17,8 +17,8 @@ public class AStarPathfinding
 
     public List<Cell> FindPath(Grid _grid, Cell _start, Cell _end)
     {
-        openList = new List<Cell> { _start };
-        closedList = new List<Cell>();
+        m_OpenList = new List<Cell> { _start };
+        m_ClosedList = new List<Cell>();
 
         ResetCells(_grid);
 
@@ -26,33 +26,32 @@ public class AStarPathfinding
         _start.SetHCost(CalculateDistanceCost(_start, _end));
         _start.CalculateFCost();
 
-        while(openList.Count > 0)
+        while(m_OpenList.Count > 0)
         {
-            Cell currCell = GetLowestFCostCell(openList);
+            Cell currCell = GetLowestFCostCell(m_OpenList);
             if(currCell == _end)
             {
                 return CalculatePath(_end);
             }
 
-            openList.Remove(currCell);
-            closedList.Add(currCell);
+            m_OpenList.Remove(currCell);
+            m_ClosedList.Add(currCell);
 
             List<Cell> neighbors = currCell.GetNeighbors();
 
             foreach (Cell neighbourCell in neighbors)
             {
-                if (closedList.Contains(neighbourCell))
+                if (m_ClosedList.Contains(neighbourCell))
                 {
                     continue;
                 }
 
                 if(neighbourCell.GetCost() == byte.MaxValue)
                 {
-                    closedList.Add(neighbourCell);
+                    m_ClosedList.Add(neighbourCell);
                     continue;
                 }
 
-                //int tentativeGCost = currCell.GetGCost() + CalculateDistanceCost(currCell, neighbourCell);
                 int tentativeGCost = currCell.GetGCost() + CalculateNeighborCost(currCell, neighbourCell);
                 if (tentativeGCost < neighbourCell.GetGCost())
                 {
@@ -61,9 +60,9 @@ public class AStarPathfinding
                     neighbourCell.SetHCost(CalculateDistanceCost(neighbourCell, _end));
                     neighbourCell.CalculateFCost();
 
-                    if(!openList.Contains(neighbourCell))
+                    if(!m_OpenList.Contains(neighbourCell))
                     {
-                        openList.Add(neighbourCell);
+                        m_OpenList.Add(neighbourCell);
                     }
                 }
             }
@@ -93,8 +92,8 @@ public class AStarPathfinding
 
     private int CalculateDistanceCost(Cell a, Cell b)
     {
-        float xDist = Mathf.Abs(b.xPos - a.xPos);
-        float zDist = Mathf.Abs(b.zPos - a.zPos);
+        float xDist = Mathf.Abs(b.m_XPos - a.m_XPos);
+        float zDist = Mathf.Abs(b.m_ZPos - a.m_ZPos);
 
         float remaining = Mathf.Abs(xDist - zDist);
 
@@ -103,8 +102,8 @@ public class AStarPathfinding
 
     private int CalculateNeighborCost(Cell a, Cell b)
     {
-        float xDist = Mathf.Abs(b.xPos - a.xPos);
-        float zDist = Mathf.Abs(b.zPos - a.zPos);
+        float xDist = Mathf.Abs(b.m_XPos - a.m_XPos);
+        float zDist = Mathf.Abs(b.m_ZPos - a.m_ZPos);
 
         return (int)((2 * Mathf.Min(xDist, zDist) + (a.GetCost() * 10)));
     }

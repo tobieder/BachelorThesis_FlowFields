@@ -6,49 +6,61 @@ public class FlowFieldDisplay : MonoBehaviour
 {
     public enum Directions { North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest, None};
 
-    public static FlowFieldDisplay instance;
+    private static FlowFieldDisplay _instance;
+    public static FlowFieldDisplay Instance { get { return _instance; } }
 
-    public Material textureAtlas;
+    public Material m_TextureAtlas;
 
-    private GameObject groundMesh;
-    private MeshFilter meshFilter;
-    private MeshRenderer meshRenderer;
+    private GameObject m_GroundMesh;
+    private MeshFilter m_MeshFilter;
+    private MeshRenderer m_MeshRenderer;
+
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+    }
 
     void Start()
     {
-        instance = this;
         StartCoroutine(CreateFlowFieldDirectionMesh(byte.MaxValue));
     }
 
     public IEnumerator CreateFlowFieldDirectionMesh(byte _index, Cell _destination = null)
     {
-        if (!groundMesh)
+        if (!m_GroundMesh)
         {
-            groundMesh = new GameObject("GroundMesh");
-            groundMesh.transform.parent = this.transform;
+            m_GroundMesh = new GameObject("GroundMesh");
+            m_GroundMesh.transform.parent = this.transform;
 
-            meshRenderer = groundMesh.AddComponent<MeshRenderer>();
+            m_MeshRenderer = m_GroundMesh.AddComponent<MeshRenderer>();
         }
-        if (!meshFilter)
+        if (!m_MeshFilter)
         {
-            meshFilter = groundMesh.GetComponent<MeshFilter>();
-            if (!meshFilter)
+            m_MeshFilter = m_GroundMesh.GetComponent<MeshFilter>();
+            if (!m_MeshFilter)
             {
-                meshFilter = groundMesh.AddComponent<MeshFilter>();
+                m_MeshFilter = m_GroundMesh.AddComponent<MeshFilter>();
             }
         }
-        if (!meshRenderer)
+        if (!m_MeshRenderer)
         {
-            meshRenderer = groundMesh.GetComponent<MeshRenderer>();
-            if (!meshRenderer)
+            m_MeshRenderer = m_GroundMesh.GetComponent<MeshRenderer>();
+            if (!m_MeshRenderer)
             {
-                meshRenderer = groundMesh.AddComponent<MeshRenderer>();
+                m_MeshRenderer = m_GroundMesh.AddComponent<MeshRenderer>();
             }
         }
 
-        groundMesh.transform.localPosition = new Vector3(0.0f, 0.01f, 0.0f);
+        m_GroundMesh.transform.localPosition = new Vector3(0.0f, 0.01f, 0.0f);
 
-        Grid grid = GridCreator.grid;
+        Grid grid = GridCreator.s_Grid;
 
         Vector3[] vertices = new Vector3[4 + (((grid.GetWidth() - 1) * 2) * 2) + (((grid.GetHeight() - 1) * 2) * 2) + (((grid.GetWidth() - 1) * (grid.GetHeight() - 1)) * 4)];
         Vector2[] uvs = new Vector2[4 + (((grid.GetWidth() - 1) * 2) * 2) + (((grid.GetHeight() - 1) * 2) * 2) + (((grid.GetWidth() - 1) * (grid.GetHeight() - 1)) * 4)];
@@ -61,10 +73,10 @@ public class FlowFieldDisplay : MonoBehaviour
             for (int x = 0; x < grid.GetWidth(); x++)
             {
                 Cell currCell = grid.getCell(x, z);
-                vertices[vertexCount + 0] = new Vector3(currCell.xPos - (grid.GetCellSize() * 0.5f), 0.0f, currCell.zPos - (grid.GetCellSize() * 0.5f));
-                vertices[vertexCount + 1] = new Vector3(currCell.xPos - (grid.GetCellSize() * 0.5f), 0.0f, currCell.zPos + (grid.GetCellSize() * 0.5f));
-                vertices[vertexCount + 2] = new Vector3(currCell.xPos + (grid.GetCellSize() * 0.5f), 0.0f, currCell.zPos + (grid.GetCellSize() * 0.5f));
-                vertices[vertexCount + 3] = new Vector3(currCell.xPos + (grid.GetCellSize() * 0.5f), 0.0f, currCell.zPos - (grid.GetCellSize() * 0.5f));
+                vertices[vertexCount + 0] = new Vector3(currCell.m_XPos - (grid.GetCellSize() * 0.5f), 0.0f, currCell.m_ZPos - (grid.GetCellSize() * 0.5f));
+                vertices[vertexCount + 1] = new Vector3(currCell.m_XPos - (grid.GetCellSize() * 0.5f), 0.0f, currCell.m_ZPos + (grid.GetCellSize() * 0.5f));
+                vertices[vertexCount + 2] = new Vector3(currCell.m_XPos + (grid.GetCellSize() * 0.5f), 0.0f, currCell.m_ZPos + (grid.GetCellSize() * 0.5f));
+                vertices[vertexCount + 3] = new Vector3(currCell.m_XPos + (grid.GetCellSize() * 0.5f), 0.0f, currCell.m_ZPos - (grid.GetCellSize() * 0.5f));
 
                 vertexCount += 4;
             }
@@ -73,11 +85,11 @@ public class FlowFieldDisplay : MonoBehaviour
         // Set UVs
         Vector2[] curruvs;
         int uvIterator = 0;
-        for (int x = 0; x < GridCreator.grid.GetWidth(); x++)
+        for (int x = 0; x < GridCreator.s_Grid.GetWidth(); x++)
         {
-            for (int z = 0; z < GridCreator.grid.GetHeight(); z++)
+            for (int z = 0; z < GridCreator.s_Grid.GetHeight(); z++)
             {
-                Cell currCell = GridCreator.grid.getCell(z, x);
+                Cell currCell = GridCreator.s_Grid.getCell(z, x);
                 float angle = Vector3.Angle(new Vector3(0.0f, 0.0f, 1.0f), currCell.GetFlowFieldDirection(_index));
                 Vector3 cross = Vector3.Cross(new Vector3(0.0f, 0.0f, 1.0f), currCell.GetFlowFieldDirection(_index));
                 if (cross.y < 0) angle = -angle;
@@ -161,9 +173,9 @@ public class FlowFieldDisplay : MonoBehaviour
         mesh.uv = uvs;
         mesh.triangles = triangles;
 
-        meshFilter.mesh = mesh;
+        m_MeshFilter.mesh = mesh;
 
-        meshRenderer.sharedMaterial = textureAtlas;
+        m_MeshRenderer.sharedMaterial = m_TextureAtlas;
 
         Vector3[] normals = new Vector3[vertices.Length];
         for (int i = 0; i < normals.Length; i++)

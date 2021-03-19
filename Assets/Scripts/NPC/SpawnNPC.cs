@@ -5,8 +5,8 @@ using UnityEngine.EventSystems;
 
 public class SpawnNPC : MonoBehaviour
 {
-    public Transform parent;
-    public GameObject npc;
+    public Transform m_Parent;
+    public GameObject m_NPC;
 
     void Start()
     {
@@ -29,10 +29,10 @@ public class SpawnNPC : MonoBehaviour
         if(Physics.Raycast(ray, out hit))
         {
             // TEMP: limit spawn area to grid size
-            if (hit.point.x < -(0.5 * GridCreator.grid.GetCellSize()) || 
-                hit.point.z < -(0.5 * GridCreator.grid.GetCellSize()) || 
-                hit.point.x > ((GridCreator.grid.GetWidth() * GridCreator.grid.GetCellSize()) - (GridCreator.grid.GetCellSize() / 2.0f)) ||
-                hit.point.z > ((GridCreator.grid.GetHeight() * GridCreator.grid.GetCellSize() - (GridCreator.grid.GetCellSize() / 2.0f))))
+            if (hit.point.x < -(0.5 * GridCreator.s_Grid.GetCellSize()) || 
+                hit.point.z < -(0.5 * GridCreator.s_Grid.GetCellSize()) || 
+                hit.point.x > ((GridCreator.s_Grid.GetWidth() * GridCreator.s_Grid.GetCellSize()) - (GridCreator.s_Grid.GetCellSize() / 2.0f)) ||
+                hit.point.z > ((GridCreator.s_Grid.GetHeight() * GridCreator.s_Grid.GetCellSize() - (GridCreator.s_Grid.GetCellSize() / 2.0f))))
             {
                 Debug.Log("Unable to spawn NPC out of grid bounds!");
             }
@@ -45,6 +45,6 @@ public class SpawnNPC : MonoBehaviour
 
     void CreateNPCAtPos(Vector3 _pos)
     {
-        Instantiate(npc, _pos, Quaternion.Euler(1.0f, 0.0f, 0.0f), parent);
+        Instantiate(m_NPC, _pos, Quaternion.Euler(1.0f, 0.0f, 0.0f), m_Parent);
     }
 }

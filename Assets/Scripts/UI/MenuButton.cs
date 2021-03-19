@@ -8,37 +8,37 @@ using UnityEngine.Events;
 [RequireComponent(typeof(Image))]
 public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    public MenuButtonGroup menuButtonGroup;
+    public MenuButtonGroup m_MenuButtonGroup;
 
     public UnityEvent onMenuButtonSelected;
     public UnityEvent onMenuButtonDeselected;
 
-    private Image background;
+    private Image m_Background;
 
     void Start()
     {
-        background = GetComponent<Image>();
-        menuButtonGroup.Subscribe(this);
+        m_Background = GetComponent<Image>();
+        m_MenuButtonGroup.Subscribe(this);
     }
 
     public void SetTint(Color _color)
     {
-        background.color = _color;
+        m_Background.color = _color;
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        menuButtonGroup.OnTabSelected(this);
+        m_MenuButtonGroup.OnTabSelected(this);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        menuButtonGroup.OnTabEnter(this);
+        m_MenuButtonGroup.OnTabEnter(this);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        menuButtonGroup.OnTabExit(this);
+        m_MenuButtonGroup.OnTabExit(this);
     }
 
     public void Select()
