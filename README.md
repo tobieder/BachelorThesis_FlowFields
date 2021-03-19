@@ -1,5 +1,7 @@
 # Flow Fields for motion control of large NPC groups in real-time strategy games
 
+![FlowFields](/GithubImages/flowfield.png?raw=true "Flow Field")
+
 Pathfinding algorithms are a particularly important component of real-time strategy games. In order to solve the dependency of the required computing time on the number of troops
 flow fields can be used to solve the dependency of the required computing time on the number of troops on a field. The goal of this work
 is to answer the question whether flow fields are a reasonable alternative to the widely used
